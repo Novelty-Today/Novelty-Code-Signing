@@ -1,18 +1,20 @@
 require("dotenv").config();
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
 const {
-  web3,
   signTransaction,
   createTransaction,
   sendTransaction,
 } = require("./transactionFunctions");
+const web3 = require('./ReferenceObjects')
 
 // NFT Contract Information
 const contract = require("../artifacts/contracts/EC721.sol/MyNFT.json");
 const contractAddress = "0xca0f89b4197558a816f0c57c14ef506a70a9dfdb";
 const nftContract = new web3.eth.Contract(contract.abi, contractAddress);
 
-async function mintNFT(recepient, tokenURI) {
+
+// for tokenURI there should be a file with code
+const mintNFT = async (recepient, tokenURI) => {
 
   const transactionData = nftContract.methods
     .mintNFT(recepient, tokenURI)
@@ -20,9 +22,7 @@ async function mintNFT(recepient, tokenURI) {
 
   const tx = await createTransaction(contractAddress, transactionData);
   const signedTx = await signTransaction(tx);
-  console.log('4',signedTx.rawTransaction)
-  sendTransaction(signedTx.rawTransaction, textOutput);
-  console.log('5')
+  sendTransaction(signedTx, textOutput);
 }
 
 const textOutput = function (err, hash) {

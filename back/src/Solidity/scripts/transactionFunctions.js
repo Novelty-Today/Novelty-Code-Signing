@@ -1,8 +1,7 @@
 require("dotenv").config();
-const { API_URL, PUBLIC_KEY, PRIVATE_KEY } = process.env;
+const {  PUBLIC_KEY, PRIVATE_KEY } = process.env;
+const web3 = require('./ReferenceObjects')
 
-const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
-const web3 = createAlchemyWeb3(API_URL);
 
 const createTransaction = async (contractAddress, transactionData) => {
   const nonce = await web3.eth.getTransactionCount(PUBLIC_KEY, "latest"); //get latest nonce
@@ -21,7 +20,7 @@ const signTransaction = (tx) => {
 };
 
 const sendTransaction = (signedTx,textOutput) => {
-    web3.eth.sendSignedTransaction(signedTx.rawTransaction, textOutput);
+    return web3.eth.sendSignedTransaction(signedTx.rawTransaction, textOutput);
 }
 
-module.exports = { web3, createTransaction, signTransaction,sendTransaction };
+module.exports = { createTransaction, signTransaction,sendTransaction };
