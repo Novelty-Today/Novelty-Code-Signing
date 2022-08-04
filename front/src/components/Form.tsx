@@ -1,4 +1,4 @@
-import { FormEvent, SetStateAction, useRef, useState } from "react";
+import { FormEvent, SetStateAction, useRef, useState, RefObject } from "react";
 import { Buffer } from "buffer";
 import detectEthereumProvider from "@metamask/detect-provider";
 
@@ -40,14 +40,25 @@ const checkWebProviderAndConnect = async () => {
 };
 
 const OnSubmitSign = async (
-  data: string,
+  fileToSignRef: RefObject<HTMLInputElement>,
   setVerificationKey: (arg: SetStateAction<string>) => void,
   e: FormEvent
 ) => {
   e.preventDefault();
+  if (
+    !fileToSignRef.current!.files ||
+    fileToSignRef.current!.files.length === 0
+  ) {
+    alert("No file selected, please select a file to sign");
+    return;
+  }
+  if (fileToSignRef.current!.files && fileToSignRef.current!.files.length > 1) {
+    alert("Too many files selected, please select only a single file");
+  }
   const address = await checkWebProviderAndConnect();
-  console.log("address", address);
-  const msg = `0x${Buffer.from(data, "utf8").toString("hex")}`;
+  const dataArray = await fileToSignRef.current!.files[0].arrayBuffer();
+  const buffer = Buffer.from(dataArray);
+  const msg = `0x${buffer.toString("hex")}`;
   const sign = await window.ethereum.request({
     method: "personal_sign",
     params: [msg, address, ""],
@@ -56,44 +67,56 @@ const OnSubmitSign = async (
 };
 
 const OnSubmitVerify = async (
-  data: string,
+  fileToVerifyRef: RefObject<HTMLInputElement>,
   verificationKey: string,
   e: FormEvent
 ) => {
   e.preventDefault();
-  const msg = `0x${Buffer.from(data, "utf8").toString("hex")}`;
+  if (
+    !fileToVerifyRef.current!.files ||
+    fileToVerifyRef.current!.files.length === 0
+  ) {
+    alert("No file selected, please select a file to sign");
+    return;
+  }
+  if (
+    fileToVerifyRef.current!.files &&
+    fileToVerifyRef.current!.files.length > 1
+  ) {
+    alert("Too many files selected, please select only a single file");
+  }
+  const dataArray = await fileToVerifyRef.current!.files[0].arrayBuffer();
+  const buffer = Buffer.from(dataArray);
+  const msg = `0x${buffer.toString("hex")}`;
   try {
     const signedAddress = await window.ethereum.request({
       method: "personal_ecRecover",
       params: [msg, verificationKey],
     });
-    alert(`message signed by ${signedAddress}`);
+    alert(`file signed by ${signedAddress}`);
   } catch (e) {
     alert("verification failed");
   }
 };
 
 export const Form = () => {
-  const dataToSignRef = useRef<HTMLInputElement>(null);
-  const dataToVerifyRef = useRef<HTMLInputElement>(null);
+  const fileToSignRef = useRef<HTMLInputElement>(null);
+  const fileToVerifyRef = useRef<HTMLInputElement>(null);
   const verificationKeyRef = useRef<HTMLInputElement>(null);
   // first form output
   const [verificationKey, setVerificationKey] = useState("");
   return (
     <div className="w-2/6 mx-auto flex flex-col gap-5">
       <div className="flex flex-col gap-5 p-5 border-solid border-black border-2">
-        <h1 className="text-xl">Sign Data</h1>
+        <h1 className="text-xl">Sign a File</h1>
         <form
           action="#"
-          onSubmit={(e) =>
-            OnSubmitSign(dataToSignRef.current!.value, setVerificationKey, e)
-          }
+          onSubmit={(e) => OnSubmitSign(fileToSignRef, setVerificationKey, e)}
           className="flex flex-col w-full gap-1"
         >
           <input
-            type="text"
-            ref={dataToSignRef}
-            placeholder="Data to Sign"
+            type="file"
+            ref={fileToSignRef}
             className="border-solid border-black border-2 text-center"
           />
           <input
@@ -115,7 +138,7 @@ export const Form = () => {
           action="#"
           onSubmit={(e) =>
             OnSubmitVerify(
-              dataToVerifyRef.current!.value,
+              fileToVerifyRef,
               verificationKeyRef.current!.value,
               e
             )
@@ -123,9 +146,8 @@ export const Form = () => {
           className="flex flex-col w-full gap-2"
         >
           <input
-            type="text"
-            ref={dataToVerifyRef}
-            placeholder="Data to Verify"
+            type="file"
+            ref={fileToVerifyRef}
             className="border-solid border-black border-2 text-center"
           />
           <input
