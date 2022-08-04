@@ -8,8 +8,6 @@ const {
 const web3 = require("./ReferenceObjects");
 const { uploadToIPFS } = require("./ipfsFunctions");
 
-
-
 // NFT Contract Information
 const contract = require("../artifacts/contracts/EC721.sol/NoveltyNFT.json");
 const contractAddress = "0xca0f89b4197558a816f0c57c14ef506a70a9dfdb";
@@ -17,8 +15,7 @@ const nftContract = new web3.eth.Contract(contract.abi, contractAddress);
 
 // for tokenURI there should be a file with code
 const mintNFT = async (recepient, json) => {
-
-  const tokenURI  = await uploadToIPFS(json);
+  const tokenURI = await uploadToIPFS(json);
 
   const transactionData = nftContract.methods
     .mintNFT(recepient, tokenURI)
@@ -40,8 +37,10 @@ const textOutput = function (err, hash) {
     console.log("Something went wrong when submitting your transaction:", err);
   }
 };
-
-mintNFT(
-  PUBLIC_KEY,
-  {ks:'as'}
-);
+const cleanArgv = process.argv.slice(2);
+mintNFT(PUBLIC_KEY, {
+  filename: cleanArgv[0],
+  signature: cleanArgv[1],
+  timestamp: cleanArgv[2],
+  userAddress: cleanArgv[3],
+});
