@@ -1,6 +1,7 @@
 import { FormEvent, SetStateAction, useRef, useState, RefObject } from "react";
 import { Buffer } from "buffer";
 import detectEthereumProvider from "@metamask/detect-provider";
+import { addSignature } from "../API/addSignature";
 
 const metamaskConnect = async () => {
   try {
@@ -55,15 +56,21 @@ const OnSubmitSign = async (
   if (fileToSignRef.current!.files && fileToSignRef.current!.files.length > 1) {
     alert("Too many files selected, please select only a single file");
   }
-  const address = await checkWebProviderAndConnect();
+  const address: string = await checkWebProviderAndConnect();
   const dataArray = await fileToSignRef.current!.files[0].arrayBuffer();
   const buffer = Buffer.from(dataArray);
   const msg = `0x${buffer.toString("hex")}`;
-  const sign = await window.ethereum.request({
+  const signature: string = await window.ethereum.request({
     method: "personal_sign",
     params: [msg, address, ""],
   });
-  setVerificationKey(sign);
+  await addSignature({
+    filename: fileToSignRef.current!.files[0].name,
+    signature,
+    timestamp: new Date().toUTCString(),
+    userAddress: address,
+  });
+  setVerificationKey(signature);
 };
 
 const OnSubmitVerify = async (
