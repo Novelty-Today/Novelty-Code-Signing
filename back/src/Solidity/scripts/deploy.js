@@ -1,6 +1,7 @@
-async function main() {
+const contract  = "NoveltyNFT" // change contract here
 
-    const MyContract = await ethers.getContractFactory("NoveltyNFT") // global variable ethers from hardhat library
+async function main() {
+    const MyContract = await ethers.getContractFactory(contract) // global variable ethers from hardhat library
     const myContract = await MyContract.deploy() // Start deployment, returning a promise that resolves to a contract object
     await myContract.deployed()
     console.log("Contract deployed to address:", myContract.address)

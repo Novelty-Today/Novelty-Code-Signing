@@ -1,20 +1,24 @@
 require("dotenv").config();
-const PUBLIC_KEY = process.env.PUBLIC_KEY;
+const { PUBLIC_KEY } = process.env;
 const {
   signTransaction,
   createTransaction,
   sendTransaction,
 } = require("./transactionFunctions");
-const web3 = require('./ReferenceObjects')
+const web3 = require("./ReferenceObjects");
+const { uploadToIPFS } = require("./ipfsFunctions");
+
+
 
 // NFT Contract Information
-const contract = require("../artifacts/contracts/EC721.sol/MyNFT.json");
+const contract = require("../artifacts/contracts/EC721.sol/NoveltyNFT.json");
 const contractAddress = "0xca0f89b4197558a816f0c57c14ef506a70a9dfdb";
 const nftContract = new web3.eth.Contract(contract.abi, contractAddress);
 
-
 // for tokenURI there should be a file with code
-const mintNFT = async (recepient, tokenURI) => {
+const mintNFT = async (recepient, json) => {
+
+  const tokenURI  = await uploadToIPFS(json);
 
   const transactionData = nftContract.methods
     .mintNFT(recepient, tokenURI)
@@ -23,7 +27,7 @@ const mintNFT = async (recepient, tokenURI) => {
   const tx = await createTransaction(contractAddress, transactionData);
   const signedTx = await signTransaction(tx);
   sendTransaction(signedTx, textOutput);
-}
+};
 
 const textOutput = function (err, hash) {
   if (!err) {
@@ -39,5 +43,5 @@ const textOutput = function (err, hash) {
 
 mintNFT(
   PUBLIC_KEY,
-  "https://gateway.pinata.cloud/ipfs/QmfCs8NZE3hRfpNNrc4jovUJ74bPXqN7pmZBfEMJZojuHA"
+  {ks:'as'}
 );
