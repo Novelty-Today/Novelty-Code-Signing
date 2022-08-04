@@ -24,7 +24,7 @@ const uploadToIPFS = async (json = {}, name = "noName") => {
     const res = await axios(config);
     console.log("response pinanta", res.data);
     if (res.data.IpfsHash)
-      return `https://gateway.pinata.cloud/ipfs/${res.data.IpfsHash}`;
+      return `ipfs://${res.data.IpfsHash}`;
   } catch (error) {
     throw Error("IPFS Upload Error");
   }

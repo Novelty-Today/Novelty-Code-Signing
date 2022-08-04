@@ -37,10 +37,22 @@ const textOutput = function (err, hash) {
     console.log("Something went wrong when submitting your transaction:", err);
   }
 };
-const cleanArgv = process.argv.slice(2);
-mintNFT(PUBLIC_KEY, {
-  filename: cleanArgv[0],
-  signature: cleanArgv[1],
-  timestamp: cleanArgv[2],
-  userAddress: cleanArgv[3],
-});
+
+mintNFT(
+  PUBLIC_KEY,
+  {
+    "attributes": [
+      {
+        "trait_type": "Breed",
+        "value": "Maltipoo"
+      },
+      {
+        "trait_type": "Eye color",
+        "value": "Mocha"
+      }
+    ],
+    "description": "The world's most adorable and sensitive pup.",
+    "image": "ipfs://QmWmvTJmJU3pozR9ZHFmQC2DNDwi2XJtf3QGyYiiagFSWb",
+    "name": "Ramses"
+  }
+);
