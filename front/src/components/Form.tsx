@@ -68,17 +68,22 @@ const OnSubmitSign = async (
   const dataArray = await fileToSignRef.current!.files[0].arrayBuffer();
   const buffer = Buffer.from(dataArray);
   const msg = `0x${buffer.toString("hex")}`;
-  const signature: string = await window.ethereum.request({
-    method: "personal_sign",
-    params: [msg, address, ""],
-  });
-  const response = await addSignature({
-    filename: fileToSignRef.current!.files[0].name,
-    signature,
-    timestamp: new Date().toUTCString(),
-    userAddress: address,
-  });
-  setVerificationKey(response.tokenId);
+  try {
+    const signature: string = await window.ethereum.request({
+      method: "personal_sign",
+      params: [msg, address, ""],
+    });
+    const response = await addSignature({
+      filename: fileToSignRef.current!.files[0].name,
+      signature,
+      timestamp: new Date().toUTCString(),
+      userAddress: address,
+    });
+    setVerificationKey(response.tokenId);
+  } catch (err: any) {
+    console.log(err.message);
+    alert("Something went wrong while signing file content");
+  }
 };
 
 const OnSubmitVerify = async (
