@@ -23,6 +23,13 @@ const sendTransaction = (signedTx,textOutput) => {
     return web3.eth.sendSignedTransaction(signedTx.rawTransaction, textOutput);
 }
 
+const getTxData = (contract,method,args) =>{
+  return contract.methods[method](...args)
+  .encodeABI();
+
+}
+
+
 const createSignSendTx = async (contractAddress, transactionData) => {
   const tx = await createTransaction(contractAddress, transactionData);
   const signedTx = await signTransaction(tx);
@@ -41,4 +48,4 @@ const textOutput = function (err, hash) {
   }
 };
 
-module.exports = { createTransaction, signTransaction,sendTransaction ,createSignSendTx};
+module.exports = { getTxData ,createSignSendTx};
