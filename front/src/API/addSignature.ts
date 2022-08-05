@@ -6,7 +6,8 @@ export interface AddSignatureInput {
 	userAddress: string;
 }
 export interface AddSignatureeOutput {
-	status: "success" | "failure";
+	status: "success" | "error";
+	tokenId: number;
 }
 export const addSignature = async (body: AddSignatureInput) => {
 	return (await axios.post("http://localhost:8080/addSignature", body)).data;

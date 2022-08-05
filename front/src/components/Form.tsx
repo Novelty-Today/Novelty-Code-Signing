@@ -1,7 +1,10 @@
 import { FormEvent, SetStateAction, useRef, useState, RefObject } from "react";
 import { Buffer } from "buffer";
 import detectEthereumProvider from "@metamask/detect-provider";
+import axios from "axios";
 import { addSignature } from "../API/addSignature";
+import { getTokenURI } from "../API/getTokenURI";
+import { Spinner } from "./Spinner";
 
 const metamaskConnect = async () => {
   try {
@@ -40,6 +43,11 @@ const checkWebProviderAndConnect = async () => {
   }
 };
 
+const getHashFromURI = (URI: string) => {
+  const lastIndex = URI.lastIndexOf("/");
+  return URI.slice(lastIndex + 1);
+};
+
 const OnSubmitSign = async (
   fileToSignRef: RefObject<HTMLInputElement>,
   setVerificationKey: (arg: SetStateAction<string>) => void,
@@ -60,25 +68,38 @@ const OnSubmitSign = async (
   const dataArray = await fileToSignRef.current!.files[0].arrayBuffer();
   const buffer = Buffer.from(dataArray);
   const msg = `0x${buffer.toString("hex")}`;
-  const signature: string = await window.ethereum.request({
-    method: "personal_sign",
-    params: [msg, address, ""],
-  });
-  await addSignature({
-    filename: fileToSignRef.current!.files[0].name,
-    signature,
-    timestamp: new Date().toUTCString(),
-    userAddress: address,
-  });
-  setVerificationKey(signature);
+  try {
+    const signature: string = await window.ethereum.request({
+      method: "personal_sign",
+      params: [msg, address, ""],
+    });
+    const response = await addSignature({
+      filename: fileToSignRef.current!.files[0].name,
+      signature,
+      timestamp: new Date().toUTCString(),
+      userAddress: address,
+    });
+    setVerificationKey(response.tokenId);
+  } catch (err: any) {
+    console.log(err.message);
+    alert("Something went wrong while signing file content");
+  }
 };
 
 const OnSubmitVerify = async (
   fileToVerifyRef: RefObject<HTMLInputElement>,
+  addressToVerify: string,
   verificationKey: string,
   e: FormEvent
 ) => {
   e.preventDefault();
+  const trueAdress = (
+    /^0x/.test(addressToVerify) ? addressToVerify : `0x${addressToVerify}`
+  ).toLowerCase();
+  if (!/^[0-9]+$/.test(verificationKey)) {
+    alert("Invalid verification key");
+    return;
+  }
   if (
     !fileToVerifyRef.current!.files ||
     fileToVerifyRef.current!.files.length === 0
@@ -92,15 +113,25 @@ const OnSubmitVerify = async (
   ) {
     alert("Too many files selected, please select only a single file");
   }
+  const response = await getTokenURI(parseInt(verificationKey));
+  if (response.status === "error") {
+    alert("Invalid verification key");
+  }
+  const ipfsHash = getHashFromURI(response.URI);
+  const ipfsResponse = (
+    await axios.get(`https://gateway.pinata.cloud/ipfs/${ipfsHash}`)
+  ).data;
+  console.log(ipfsResponse);
   const dataArray = await fileToVerifyRef.current!.files[0].arrayBuffer();
   const buffer = Buffer.from(dataArray);
   const msg = `0x${buffer.toString("hex")}`;
   try {
     const signedAddress = await window.ethereum.request({
       method: "personal_ecRecover",
-      params: [msg, verificationKey],
+      params: [msg, ipfsResponse.signature],
     });
-    alert(`file signed by ${signedAddress}`);
+    if (signedAddress === trueAdress) alert("verification succeeded");
+    else alert("verification failed");
   } catch (e) {
     alert("verification failed");
   }
@@ -109,7 +140,11 @@ const OnSubmitVerify = async (
 export const Form = () => {
   const fileToSignRef = useRef<HTMLInputElement>(null);
   const fileToVerifyRef = useRef<HTMLInputElement>(null);
+  const addressToVerifyRef = useRef<HTMLInputElement>(null);
   const verificationKeyRef = useRef<HTMLInputElement>(null);
+
+  const [isSignerLoading, setIsSignerLoading] = useState(false);
+  const [isVerifierLoading, setIsVerifierLoading] = useState(false);
   // first form output
   const [verificationKey, setVerificationKey] = useState("");
   return (
@@ -118,7 +153,13 @@ export const Form = () => {
         <h1 className="text-xl">Sign a File</h1>
         <form
           action="#"
-          onSubmit={(e) => OnSubmitSign(fileToSignRef, setVerificationKey, e)}
+          onSubmit={async (e) => {
+            if (!isSignerLoading) {
+              setIsSignerLoading(true);
+              await OnSubmitSign(fileToSignRef, setVerificationKey, e);
+              setIsSignerLoading(false);
+            }
+          }}
           className="flex flex-col w-full gap-1"
         >
           <input
@@ -126,11 +167,17 @@ export const Form = () => {
             ref={fileToSignRef}
             className="border-solid border-black border-2 text-center"
           />
-          <input
-            type="submit"
-            value="Submit"
-            className="border-solid border-black border-2 text-center"
-          />
+          {!isSignerLoading ? (
+            <input
+              type="submit"
+              value="Submit"
+              className="border-solid border-black border-2 text-center"
+            />
+          ) : (
+            <div className="flex items-center justify-center py-2">
+              <Spinner />
+            </div>
+          )}
         </form>
         {verificationKey && (
           <span>
@@ -143,13 +190,18 @@ export const Form = () => {
         <h1 className="text-xl">Verify Signiture</h1>
         <form
           action="#"
-          onSubmit={(e) =>
-            OnSubmitVerify(
-              fileToVerifyRef,
-              verificationKeyRef.current!.value,
-              e
-            )
-          }
+          onSubmit={async (e) => {
+            if (!isVerifierLoading) {
+              setIsVerifierLoading(true);
+              await OnSubmitVerify(
+                fileToVerifyRef,
+                addressToVerifyRef.current!.value,
+                verificationKeyRef.current!.value,
+                e
+              );
+              setIsVerifierLoading(false);
+            }
+          }}
           className="flex flex-col w-full gap-2"
         >
           <input
@@ -159,15 +211,27 @@ export const Form = () => {
           />
           <input
             type="text"
+            ref={addressToVerifyRef}
+            placeholder="Address to Compare With"
+            className="border-solid border-black border-2 text-center"
+          />
+          <input
+            type="text"
             ref={verificationKeyRef}
             placeholder="Verification Key"
             className="border-solid border-black border-2 text-center"
           />
-          <input
-            type="submit"
-            value="Submit"
-            className="border-solid border-black border-2 text-center"
-          />
+          {!isVerifierLoading ? (
+            <input
+              type="submit"
+              value="Submit"
+              className="border-solid border-black border-2 text-center"
+            />
+          ) : (
+            <div className="flex items-center justify-center">
+              <Spinner />
+            </div>
+          )}
         </form>
       </div>
     </div>

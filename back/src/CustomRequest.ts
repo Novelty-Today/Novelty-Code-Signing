@@ -9,5 +9,4 @@ export interface AddSignatureInput {
 	signature: string;
 	timestamp: string;
 	userAddress: string;
-  }
-  
+}
