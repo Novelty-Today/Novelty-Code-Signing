@@ -88,14 +88,10 @@ const OnSubmitSign = async (
 
 const OnSubmitVerify = async (
   fileToVerifyRef: RefObject<HTMLInputElement>,
-  addressToVerify: string,
   verificationKey: string,
   e: FormEvent
 ) => {
   e.preventDefault();
-  const trueAdress = (
-    /^0x/.test(addressToVerify) ? addressToVerify : `0x${addressToVerify}`
-  ).toLowerCase();
   if (!/^[0-9]+$/.test(verificationKey)) {
     alert("Invalid verification key");
     return;
@@ -118,9 +114,8 @@ const OnSubmitVerify = async (
     alert("Invalid verification key");
   }
   const ipfsHash = getHashFromURI(response.URI);
-  const ipfsResponse = (
-    await axios.get(`https://gateway.pinata.cloud/ipfs/${ipfsHash}`)
-  ).data;
+  const ipfsResponse = (await axios.get(`https://dweb.link/ipfs/${ipfsHash}`))
+    .data;
   console.log(ipfsResponse);
   const dataArray = await fileToVerifyRef.current!.files[0].arrayBuffer();
   const buffer = Buffer.from(dataArray);
@@ -130,8 +125,7 @@ const OnSubmitVerify = async (
       method: "personal_ecRecover",
       params: [msg, ipfsResponse.signature],
     });
-    if (signedAddress === trueAdress) alert("verification succeeded");
-    else alert("verification failed");
+    alert(`Verification succeeded!\n${signedAddress} has signed this file.\n`);
   } catch (e) {
     alert("verification failed");
   }
@@ -140,7 +134,6 @@ const OnSubmitVerify = async (
 export const Form = () => {
   const fileToSignRef = useRef<HTMLInputElement>(null);
   const fileToVerifyRef = useRef<HTMLInputElement>(null);
-  const addressToVerifyRef = useRef<HTMLInputElement>(null);
   const verificationKeyRef = useRef<HTMLInputElement>(null);
 
   const [isSignerLoading, setIsSignerLoading] = useState(false);
@@ -195,7 +188,6 @@ export const Form = () => {
               setIsVerifierLoading(true);
               await OnSubmitVerify(
                 fileToVerifyRef,
-                addressToVerifyRef.current!.value,
                 verificationKeyRef.current!.value,
                 e
               );
@@ -207,12 +199,6 @@ export const Form = () => {
           <input
             type="file"
             ref={fileToVerifyRef}
-            className="border-solid border-black border-2 text-center"
-          />
-          <input
-            type="text"
-            ref={addressToVerifyRef}
-            placeholder="Address to Compare With"
             className="border-solid border-black border-2 text-center"
           />
           <input
