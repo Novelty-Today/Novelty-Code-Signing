@@ -11,7 +11,7 @@ app.use(json());
 app.use(cors());
 
 // NFT Contract Information
-const contractAddress = "0xca0f89b4197558a816f0c57c14ef506a70a9dfdb";
+const contractAddress = "0xD240d3C19E45B9D947F1E46D89F5e67090134D09";
 const nftContract = new web3.eth.Contract(contract.abi, contractAddress);
 
 app.post(
@@ -36,7 +36,6 @@ app.post(
 
 app.get("/getTokenURI/:tokenId", async (req, res) => {
   const tokenId = parseInt(req.params.tokenId);
-  console.log(tokenId);
   try {
     const result = await nftContract.methods.tokenURI([tokenId]).call();
     res.status(200).send({ status: "success", URI: result });
