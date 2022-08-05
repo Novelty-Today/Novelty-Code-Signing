@@ -23,4 +23,22 @@ const sendTransaction = (signedTx,textOutput) => {
     return web3.eth.sendSignedTransaction(signedTx.rawTransaction, textOutput);
 }
 
-module.exports = { createTransaction, signTransaction,sendTransaction };
+const createSignSendTx = async (contractAddress, transactionData) => {
+  const tx = await createTransaction(contractAddress, transactionData);
+  const signedTx = await signTransaction(tx);
+  return sendTransaction(signedTx, textOutput);
+}
+
+const textOutput = function (err, hash) {
+  if (!err) {
+    console.log(
+      "The hash of your transaction is: ",
+      hash,
+      "\nCheck Alchemy's Mempool to view the status of your transaction!"
+    );
+  } else {
+    console.log("Something went wrong when submitting your transaction:", err);
+  }
+};
+
+module.exports = { createTransaction, signTransaction,sendTransaction ,createSignSendTx};
