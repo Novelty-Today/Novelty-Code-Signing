@@ -1,10 +1,11 @@
-import { forwardRef, Ref, useId, useState, Fragment } from "react";
+import { forwardRef, Ref, useState, Fragment } from "react";
 
-export interface FileSelectorProps {}
+export interface FileSelectorProps {
+	id: string;
+}
 
 const FileSelector = forwardRef(
-	(_: FileSelectorProps, ref: Ref<HTMLInputElement>) => {
-		const id = useId();
+	({ id }: FileSelectorProps, ref: Ref<HTMLInputElement>) => {
 		const [filename, setFilename] = useState("No File Selected");
 		return (
 			<Fragment>

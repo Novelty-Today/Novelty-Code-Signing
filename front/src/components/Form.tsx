@@ -64,6 +64,7 @@ const OnSubmitSign = async (
   }
   if (fileToSignRef.current!.files && fileToSignRef.current!.files.length > 1) {
     alert("Too many files selected, please select only a single file");
+    return;
   }
   const address: string = await checkWebProviderAndConnect();
   const dataArray = await fileToSignRef.current!.files[0].arrayBuffer();
@@ -127,9 +128,13 @@ const OnSubmitVerify = async (
       method: "personal_ecRecover",
       params: [msg, ipfsResponse.signature],
     });
-    alert(`Verification succeeded!\n${signedAddress} has signed this file.\n`);
+    if (signedAddress === ipfsResponse.userAddress)
+      alert(
+        `Verification succeeded!\n${signedAddress} has signed this file.\n`
+      );
+    else alert("Verification failed");
   } catch (e) {
-    alert("verification failed");
+    alert("Verification failed");
   }
 };
 
@@ -157,7 +162,7 @@ export const Form = () => {
           }}
           className="flex flex-col w-full gap-1"
         >
-          <FileSelector ref={fileToSignRef} />
+          <FileSelector ref={fileToSignRef} id="fileToSignId" />
           {!isSignerLoading ? (
             <div className="flex items-center justify-center">
               <input
@@ -196,7 +201,7 @@ export const Form = () => {
           }}
           className="flex flex-col w-full gap-1"
         >
-          <FileSelector ref={fileToVerifyRef} />
+          <FileSelector ref={fileToVerifyRef} id="fileToVerifyId" />
           <input
             type="text"
             ref={verificationKeyRef}
