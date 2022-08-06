@@ -5,6 +5,7 @@ import axios from "axios";
 import { addSignature } from "../API/addSignature";
 import { getTokenURI } from "../API/getTokenURI";
 import { Spinner } from "./Spinner";
+import { FileSelector } from "./FileSelector";
 
 const metamaskConnect = async () => {
   try {
@@ -63,6 +64,7 @@ const OnSubmitSign = async (
   }
   if (fileToSignRef.current!.files && fileToSignRef.current!.files.length > 1) {
     alert("Too many files selected, please select only a single file");
+    return;
   }
   const address: string = await checkWebProviderAndConnect();
   const dataArray = await fileToSignRef.current!.files[0].arrayBuffer();
@@ -112,6 +114,7 @@ const OnSubmitVerify = async (
   const response = await getTokenURI(parseInt(verificationKey));
   if (response.status === "error") {
     alert("Invalid verification key");
+    return;
   }
   const ipfsHash = getHashFromURI(response.URI);
   const ipfsResponse = (await axios.get(`https://dweb.link/ipfs/${ipfsHash}`))
@@ -125,9 +128,13 @@ const OnSubmitVerify = async (
       method: "personal_ecRecover",
       params: [msg, ipfsResponse.signature],
     });
-    alert(`Verification succeeded!\n${signedAddress} has signed this file.\n`);
+    if (signedAddress === ipfsResponse.userAddress)
+      alert(
+        `Verification succeeded!\n${signedAddress} has signed this file.\n`
+      );
+    else alert("Verification failed");
   } catch (e) {
-    alert("verification failed");
+    alert("Verification failed");
   }
 };
 
@@ -141,9 +148,9 @@ export const Form = () => {
   // first form output
   const [verificationKey, setVerificationKey] = useState("");
   return (
-    <div className="w-2/6 mx-auto flex flex-col gap-5">
-      <div className="flex flex-col gap-5 p-5 border-solid border-black border-2">
-        <h1 className="text-xl">Sign a File</h1>
+    <div className="w-2/6 mx-auto flex flex-col gap-5 text-center">
+      <div className="flex flex-col gap-5 p-5 border-solid border-black border-2 rounded-xl">
+        <h1 className="text-xl text-center">Sign a File</h1>
         <form
           action="#"
           onSubmit={async (e) => {
@@ -155,19 +162,17 @@ export const Form = () => {
           }}
           className="flex flex-col w-full gap-1"
         >
-          <input
-            type="file"
-            ref={fileToSignRef}
-            className="border-solid border-black border-2 text-center"
-          />
+          <FileSelector ref={fileToSignRef} id="fileToSignId" />
           {!isSignerLoading ? (
-            <input
-              type="submit"
-              value="Submit"
-              className="border-solid border-black border-2 text-center"
-            />
+            <div className="flex items-center justify-center">
+              <input
+                type="submit"
+                value="Submit"
+                className="bg-[#ff1818] rounded-[12px] py-2.5 px-5 hover:bg-[#1f1c1c] hover:shadow-lg my-2 font-bold text-white cursor-pointer duration-500 text-center max-w-min"
+              />
+            </div>
           ) : (
-            <div className="flex items-center justify-center py-2">
+            <div className="flex items-center justify-center my-2">
               <Spinner />
             </div>
           )}
@@ -179,8 +184,8 @@ export const Form = () => {
           </span>
         )}
       </div>
-      <div className="flex flex-col gap-5 p-5 border-solid border-black border-2">
-        <h1 className="text-xl">Verify Signiture</h1>
+      <div className="flex flex-col gap-5 p-5 border-solid border-black border-2 rounded-xl">
+        <h1 className="text-xl text-center">Verify Signiture</h1>
         <form
           action="#"
           onSubmit={async (e) => {
@@ -194,27 +199,25 @@ export const Form = () => {
               setIsVerifierLoading(false);
             }
           }}
-          className="flex flex-col w-full gap-2"
+          className="flex flex-col w-full gap-1"
         >
-          <input
-            type="file"
-            ref={fileToVerifyRef}
-            className="border-solid border-black border-2 text-center"
-          />
+          <FileSelector ref={fileToVerifyRef} id="fileToVerifyId" />
           <input
             type="text"
             ref={verificationKeyRef}
             placeholder="Verification Key"
-            className="border-solid border-black border-2 text-center"
+            className="border-solid border-black border-2 text-center placeholder-gray-700"
           />
           {!isVerifierLoading ? (
-            <input
-              type="submit"
-              value="Submit"
-              className="border-solid border-black border-2 text-center"
-            />
+            <div className="flex items-center justify-center my-2">
+              <input
+                type="submit"
+                value="Submit"
+                className="bg-[#ff1818] rounded-[12px] py-2.5 px-5 hover:bg-[#1f1c1c] hover:shadow-lg p-1 font-bold text-white cursor-pointer duration-500 text-center max-w-min"
+              />
+            </div>
           ) : (
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center my-2">
               <Spinner />
             </div>
           )}
