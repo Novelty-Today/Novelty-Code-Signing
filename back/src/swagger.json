@@ -1,0 +1,141 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Code Signing API",
+    "description": "Novelty Code Signing API"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8081"
+    }
+  ],
+  "tags": [
+    {
+      "name": "code-signing",
+      "description": "API for signing code from Novelty Today"
+    }
+  ],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/getTokenURI/{tokenId}": {
+      "get": {
+        "tags": ["code-signing"],
+        "summary": "retrieve necessary ipfs uri for verification",
+        "parameters": [
+          {
+            "name": "tokenId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "firstResponse": {
+                    "value": {
+                      "status": "success",
+                      "URI": "ipfs://.."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "firstResponse": {
+                    "value": {
+                      "status": "error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/addSignature": {
+      "post": {
+        "tags": ["code-signing"],
+        "summary": "store file signature inside the blockchain",
+        "requestBody": {
+          "description": "request body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "filename": {
+                    "type": "string",
+                    "required": true,
+                    "example": "example.txt"
+                  },
+                  "signature": {
+                    "type": "string",
+                    "required": true,
+                    "example": "0xc684742a2983ad99dbaa47b677bc5c9b7ff31273fa9a725626c91f90136adf2458ec6566cc598aa29dd8f3b9d9c04db31f5b3508e0574b842e8e92111b122c851c"
+                  },
+                  "timestamp": {
+                    "type": "string",
+                    "required": true,
+                    "example": "ue, 01 Aug 2021 12:00:00 GMT"
+                  },
+                  "userAddress": {
+                    "type": "string",
+                    "required": true,
+                    "example": "0xd4ab7ab216fb22827681eddfee9fbd0b831adac2"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "firstResponse": {
+                    "value": {
+                      "status": "success",
+                      "tokenId": "2"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "firstResponse": {
+                    "value": {
+                      "status": "error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
