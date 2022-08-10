@@ -4,7 +4,7 @@ import swaggerUI from "swagger-ui-express";
 
 import addSignature from "./routes/addSignature";
 import getTokenURI from "./routes/getTokenURI";
-import * as swaggerJson from "./swagger.json";
+import * as swaggerJson from "./Swagger/swagger.json";
 
 const app = express();
 
