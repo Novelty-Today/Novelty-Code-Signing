@@ -7,6 +7,21 @@ import { getTokenURI } from "../API/getTokenURI";
 import { Spinner } from "./Spinner";
 import { FileSelector } from "./FileSelector";
 
+const checkWebProviderAndConnect = async () => {
+  try {
+    const provider = await detectEthereumProvider();
+
+    if (!provider) {
+      alert("Wallet not found. Please install MetaMask.");
+    } else {
+      const tempAddress = await metamaskConnect();
+      return tempAddress;
+    }
+  } catch (error: any) {
+    alert(error?.message || "Something went wrong while connecting to wallet.");
+  }
+};
+
 const metamaskConnect = async () => {
   try {
     await window?.ethereum?.enable();
@@ -24,23 +39,7 @@ const metamaskConnect = async () => {
     } else {
       console.log(error);
     }
-
     return null;
-  }
-};
-
-const checkWebProviderAndConnect = async () => {
-  try {
-    const provider = await detectEthereumProvider();
-
-    if (!provider) {
-      alert("Wallet not found. Please install MetaMask.");
-    } else {
-      const tempAddress = await metamaskConnect();
-      return tempAddress;
-    }
-  } catch (error: any) {
-    alert(error?.message || "Something went wrong while connecting to wallet.");
   }
 };
 
@@ -75,13 +74,17 @@ const OnSubmitSign = async (
       method: "personal_sign",
       params: [msg, address, ""],
     });
-    const response = await addSignature({
-      filename: fileToSignRef.current!.files[0].name,
-      signature,
-      timestamp: new Date().toUTCString(),
-      userAddress: address,
-    });
-    setVerificationKey(response.tokenId);
+    if (signature) {
+      const response = await addSignature({
+        filename: fileToSignRef.current!.files[0].name,
+        signature,
+        timestamp: new Date().toUTCString(),
+        userAddress: address,
+      });
+      setVerificationKey(response.tokenId);
+    } else {
+      alert("The data was not signed");
+    }
   } catch (err: any) {
     console.log(err.message);
     alert("Something went wrong while signing file content");
