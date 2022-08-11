@@ -18,10 +18,10 @@ export const onSubmitSign = async (
     if (!address) return;
 
     const buffer = await makeBufferFromFile(
-      fileToSignRef.current?.files?.[0] as File
+      fileToSignRef.current?.files?.[0] as Blob
     );
 
-    const msg = `0x${buffer.toString("hex")}`;
+    const msg = `0x${buffer.toString("hex")}`; // making our file content hexidecimal
 
     const signature: string = await window.ethereum.request({
       method: "personal_sign",
@@ -99,9 +99,10 @@ export const onSubmitVerify = async (
   }
 };
 
-const makeBufferFromFile = async (file: File) => {
+const makeBufferFromFile = async (file: Blob) => {
   const dataArray = await file.arrayBuffer();
   return Buffer.from(dataArray);
+  
 };
 
 const getHashFromURI = (URI: string) => {

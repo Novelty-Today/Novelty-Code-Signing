@@ -50,7 +50,7 @@ export const SignForm = () => {
         )}
       </div>
       <div className="flex flex-col gap-5 p-5 border-solid border-black border-2 rounded-xl">
-        <h1 className="text-xl text-center">Verify Signiture</h1>
+        <h1 className="text-xl text-center">Verify Signature</h1>
         <form
           action="#"
           onSubmit={async (e) => {
