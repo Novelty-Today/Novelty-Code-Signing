@@ -1,11 +1,11 @@
 import React from "react";
 import "./App.css";
-import { Form } from "./components/Form";
+import { SignForm } from "./components/SignForm";
 
 function App() {
   return (
     <div className="font-base">
-      <Form />
+      <SignForm />
     </div>
   );
 }
