@@ -14,9 +14,8 @@ router.get("/userSignedFiles/:userWalletAddress", async (req, res) => {
   try {
     const userWalletAddress = req.params.userWalletAddress;
     const result = await getUserNFTs(userWalletAddress);
-    console.log("result", result, 'usID', userWalletAddress);
-    res.send({ status: result });
-    // res.status(200).send({ status: "success", URI: result });
+
+    res.send(result || []);
   } catch (err) {
     console.log(err);
     res.status(404).send({ status: "error" });

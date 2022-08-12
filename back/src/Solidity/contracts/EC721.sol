@@ -10,30 +10,24 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 contract NoveltyNFT is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
-    mapping(address => uint256) public balances;
-    mapping(address => uint256[]) public userNFTs;
-
+    mapping(address => uint256[]) userNFTs;
     constructor() ERC721("NoveltyNFT", "NFT") {}
 
-    function mintNFT(
-        address recipient,
-        // address userAddress,
-        string memory tokenURI
-    ) public onlyOwner returns (uint256) {
+    function mintNFT(address recipient, string memory tokenURI)
+        public onlyOwner
+        returns (uint256)
+    {
         _tokenIds.increment();
 
         uint256 newItemId = _tokenIds.current();
         _mint(recipient, newItemId);
         _setTokenURI(newItemId, tokenURI);
-        // userNFTs[userAddress].push(newItemId);
+        userNFTs[recipient].push(_tokenIds.current());
         return newItemId;
     }
 
-    function getUserNFTs(address userAddress)
-        external
-        view
-        returns (uint256[] memory)
-    {
+    function getUserNFTs(address userAddress) public view returns (uint256[] memory) {
         return userNFTs[userAddress];
     }
+
 }
