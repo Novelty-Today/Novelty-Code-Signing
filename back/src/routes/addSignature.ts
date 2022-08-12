@@ -21,7 +21,7 @@ router.post(
         res.status(200).send({ status: "error" });
       }
 
-      const transactionReciept = await mintNFT(undefined, userAddress, {
+      const transactionReciept = await mintNFT(userAddress, {
         filename,
         signature,
         timestamp,

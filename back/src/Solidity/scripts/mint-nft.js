@@ -10,11 +10,10 @@ const { contractAddress } = require("../../constants");
 // const contractAddress = "0xD240d3C19E45B9D947F1E46D89F5e67090134D09"; //"0xca0f89b4197558a816f0c57c14ef506a70a9dfdb";
 const nftContract = new web3.eth.Contract(contract.abi, contractAddress);
 
-const mintNFT = async (recepient = PUBLIC_KEY, userAddress, json) => {
+const mintNFT = async (userAddress, json) => {
   console.log('contractAddress', contractAddress)
   const tokenURI = await uploadToIPFS(json);
   const transactionData = getTxData(nftContract, "mintNFT", [
-    recepient,
     userAddress,
     tokenURI,
   ]);
