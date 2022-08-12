@@ -13,8 +13,6 @@ router.post(
   "/addSignature",
   async (req: Request<{}, AddSignatureInput>, res: Response) => {
     try {
-      console.log("\n\nrequest received");
-
       const { filename, signature, userAddress } = req.body;
       if (!filename || !signature || !userAddress) {
         res.status(200).send({ status: "error" });
