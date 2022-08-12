@@ -16,7 +16,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
-dependencies = ["requests", "web3"]
+dependencies = ["requests", "web3","eth_account"]
 
 [project.urls]
 "Homepage" = ""
