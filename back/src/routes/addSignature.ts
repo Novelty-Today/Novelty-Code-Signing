@@ -14,12 +14,14 @@ router.post(
   "/addSignature",
   async (req: Request<{}, AddSignatureInput>, res: Response) => {
     try {
+      console.log("\n\nrequest received");
+
       const { filename, signature, timestamp, userAddress } = req.body;
       if (!filename || !signature || !timestamp || !userAddress) {
         res.status(200).send({ status: "error" });
       }
 
-      const transactionReciept = await mintNFT(undefined, {
+      const transactionReciept = await mintNFT(undefined, userAddress, {
         filename,
         signature,
         timestamp,
@@ -33,6 +35,7 @@ router.post(
         ),
       });
     } catch (error) {
+      console.log(error);
       res.sendStatus(404);
     }
   }
