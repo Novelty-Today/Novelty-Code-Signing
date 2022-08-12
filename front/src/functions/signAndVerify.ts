@@ -6,10 +6,12 @@ import { addSignature } from "../API/addSignature";
 import { getTokenURI } from "../API/getTokenURI";
 
 export const onSubmitSign = async (
+  fileName: string,
   fileToSignRef: RefObject<HTMLInputElement>,
   setVerificationKey: (arg: SetStateAction<string>) => void,
   e: FormEvent,
-  setTransactionState: (arg: SetStateAction<string>) => void
+  setTransactionState: (arg: SetStateAction<string>) => void,
+  setJsonFileData: (arg: SetStateAction<{}>) => void
 ) => {
   try {
     e.preventDefault();
@@ -30,11 +32,16 @@ export const onSubmitSign = async (
     });
     if (signature) {
       setTransactionState("Transaction is being approved");
-      const response = await addSignature({
-        filename: fileToSignRef.current!.files?.[0].name as string,
+      const requestBody = {
+        filename:
+          fileName || (fileToSignRef.current!.files?.[0].name as string),
         signature,
         timestamp: new Date().toUTCString(),
         userAddress: address,
+      };
+      setJsonFileData(requestBody);
+      const response = await addSignature({
+        ...requestBody,
       });
       setVerificationKey(response.tokenId);
     } else {
