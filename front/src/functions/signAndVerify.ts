@@ -100,7 +100,7 @@ export const onSubmitVerify = async (
       method: "personal_ecRecover",
       params: [msg, ipfsResponse.signature],
     });
-    if (signedAddress === ipfsResponse.userAddress)
+    if (signedAddress.toLowerCase() === ipfsResponse.userAddress.toLowerCase())
       alert(
         `Verification succeeded!\n${signedAddress} has signed this file.\n`
       );

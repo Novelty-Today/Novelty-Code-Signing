@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { contractAddress } from "../constants";
+import { getNFTsURI } from "../Solidity/scripts/getNFTsURI";
 import { getUserNFTs } from "../Solidity/scripts/getUserNFTs";
 import web3 from "../Solidity/scripts/ReferenceObjects";
 
@@ -13,9 +14,11 @@ const router = Router();
 router.get("/userSignedFiles/:userWalletAddress", async (req, res) => {
   try {
     const userWalletAddress = req.params.userWalletAddress;
-    const result = await getUserNFTs(userWalletAddress);
-    
-    res.send(result || []);
+    const userTokenIds = await getUserNFTs(userWalletAddress);
+    if (userTokenIds) {
+      let userTokenURIs = await getNFTsURI(userTokenIds);
+      res.send(userTokenURIs);
+    } else res.send([]);
   } catch (err) {
     console.log(err);
     res.status(404).send({ status: "error" });
