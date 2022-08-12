@@ -4,7 +4,6 @@ import { mintNFT } from "../Solidity/scripts/mint-nft";
 export interface AddSignatureInput {
   filename: string;
   signature: string;
-  timestamp: string;
   userAddress: string;
 }
 
@@ -16,15 +15,15 @@ router.post(
     try {
       console.log("\n\nrequest received");
 
-      const { filename, signature, timestamp, userAddress } = req.body;
-      if (!filename || !signature || !timestamp || !userAddress) {
+      const { filename, signature, userAddress } = req.body;
+      if (!filename || !signature || !userAddress) {
         res.status(200).send({ status: "error" });
       }
 
       const transactionReciept = await mintNFT(undefined, userAddress, {
         filename,
         signature,
-        timestamp,
+        timestamp: new Date().toUTCString(),
         userAddress,
       });
 

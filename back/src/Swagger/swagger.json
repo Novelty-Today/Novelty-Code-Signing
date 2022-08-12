@@ -88,11 +88,6 @@
                     "required": true,
                     "example": "0xc684742a2983ad99dbaa47b677bc5c9b7ff31273fa9a725626c91f90136adf2458ec6566cc598aa29dd8f3b9d9c04db31f5b3508e0574b842e8e92111b122c851c"
                   },
-                  "timestamp": {
-                    "type": "string",
-                    "required": true,
-                    "example": "ue, 01 Aug 2021 12:00:00 GMT"
-                  },
                   "userAddress": {
                     "type": "string",
                     "required": true,

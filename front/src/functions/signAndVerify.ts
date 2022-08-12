@@ -33,7 +33,6 @@ export const onSubmitSign = async (
       const response = await addSignature({
         filename: fileToSignRef.current!.files?.[0].name as string,
         signature,
-        timestamp: new Date().toUTCString(),
         userAddress: address,
       });
       setVerificationKey(response.tokenId);

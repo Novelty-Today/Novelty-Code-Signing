@@ -2,7 +2,6 @@ import axios from "axios";
 export interface AddSignatureInput {
 	filename: string;
 	signature: string;
-	timestamp: string;
 	userAddress: string;
 }
 export interface AddSignatureeOutput {
