@@ -12,3 +12,6 @@
 # solidity
 /src/Solidity/cache
 /src/Solidity/artifacts
+
+# Immutable X
+/src/Solidity/scripts/imx-examples
