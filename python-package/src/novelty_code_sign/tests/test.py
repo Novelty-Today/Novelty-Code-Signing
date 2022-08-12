@@ -1,18 +1,21 @@
-import os
-import sys
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
+#!/usr/bin/env python3
+from novelty_code_sign import verify as novelty_verify;
+from novelty_code_sign import sign as novelty_sign;
+import json;
 
+file = open("./keys.json", "r");
+data = json.load(file);
+private_key = "0x{}".format(data["private_key"]);
+print("Private key loaded from ./keys.json");
+print("Started signing ./test_file.txt");
+verification_key = novelty_sign.easy_sign(file_path="./test_file.txt", filename="Test file", private_key=private_key)["tokenId"];
 
-# importing private key
-import json
-private_key = json.load(open('keys.json'))["private_key"]
+print("Successfully signed ./test_file.txt");
+print("Verification key: {}".format(verification_key));
 
-from web3.auto import w3;
-import novelty_code_sign.novelty_code_sign as code_sign
-
-file = w3.toBytes(text = "dffd") 
-print("file",file)
-sign = code_sign.advanced_sign( file,'0x{}'.format(private_key))
-print("sign",sign)
+print("Verification Started");
+result = novelty_verify.easy_verify(file_path="./test_file.txt", token_id=verification_key);
+if (result):
+    print("Successfully Verified ./test_file.txt");
+else:
+    print("Failed to verify ./test_file.txt");
