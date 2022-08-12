@@ -10,7 +10,7 @@ const FileSelector = forwardRef(
 		return (
 			<Fragment>
 				<label htmlFor={id}>
-					<div className="border-solid border-black border-2 text-center cursor-pointer">
+					<div className="border-[1px] border-[#b8b8b8] text-center cursor-pointer">
 						{filename}
 					</div>
 				</label>

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { contractAddress } from "../constants";
+import { getUserNFTs } from "../Solidity/scripts/getUserNFTs";
 import web3 from "../Solidity/scripts/ReferenceObjects";
 
 // the require is intentional here, see https://github.com/ChainSafe/web3.js/issues/3310#issuecomment-701590114
@@ -9,12 +10,15 @@ const nftContract = new web3.eth.Contract(contract.abi, contractAddress);
 
 const router = Router();
 
-router.get("/getTokenURI/:tokenId", async (req, res) => {
-  const tokenId = parseInt(req.params.tokenId);
+router.get("/userSignedFiles/:userWalletAddress", async (req, res) => {
   try {
-    const result = await nftContract.methods.tokenURI([tokenId]).call();
-    res.status(200).send({ status: "success", URI: result });
+    const userWalletAddress = req.params.userWalletAddress;
+    const result = await getUserNFTs(userWalletAddress);
+    console.log("result", result, 'usID', userWalletAddress);
+    res.send({ status: result });
+    // res.status(200).send({ status: "success", URI: result });
   } catch (err) {
+    console.log(err);
     res.status(404).send({ status: "error" });
   }
 });

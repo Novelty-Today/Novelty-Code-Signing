@@ -8,7 +8,8 @@ import { getTokenURI } from "../API/getTokenURI";
 export const onSubmitSign = async (
   fileToSignRef: RefObject<HTMLInputElement>,
   setVerificationKey: (arg: SetStateAction<string>) => void,
-  e: FormEvent
+  e: FormEvent,
+  setTransactionState: (arg: SetStateAction<string>) => void
 ) => {
   try {
     e.preventDefault();
@@ -28,19 +29,22 @@ export const onSubmitSign = async (
       params: [msg, address, ""],
     });
     if (signature) {
+      setTransactionState("Transaction is being approved");
       const response = await addSignature({
         filename: fileToSignRef.current!.files?.[0].name as string,
         signature,
         userAddress: address,
       });
       setVerificationKey(response.tokenId);
-    } else throw Error("The data was not signed");
+    } else {
+      throw Error("The data was not signed");
+    }
   } catch (error: any) {
     alert(error?.message);
   }
 };
 
-const checkWebProviderAndConnect = async () => {
+export const checkWebProviderAndConnect = async () => {
   const provider = await detectEthereumProvider(); // just gives true/false, no UI involved
 
   if (!provider) {
@@ -76,8 +80,9 @@ export const onSubmitVerify = async (
     if (response.status === "error") throw Error("Invalid verification key");
 
     const ipfsHash = getHashFromURI(response.URI);
-    const ipfsResponse = (await axios.get(`https://dweb.link/ipfs/${ipfsHash}`))
-      .data;
+    const ipfsResponse = (
+      await axios.get(`https://novelty.mypinata.cloud/ipfs/${ipfsHash}`)
+    ).data;
 
     const buffer = await makeBufferFromFile(
       fileToVerifyRef.current?.files?.[0] as File
