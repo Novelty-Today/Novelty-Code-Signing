@@ -21,6 +21,7 @@ export const SignForm = () => {
   const [isVerifierLoading, setIsVerifierLoading] = useState(false);
   const [fileName, setFileName] = useState("");
   const [transactionState, setTransactionState] = useState("");
+  const [jsonFileData, setJsonFileData] = useState({});
 
   // first form output
   const [verificationKey, setVerificationKey] = useState("");
@@ -47,10 +48,12 @@ export const SignForm = () => {
             if (!isSignerLoading) {
               setIsSignerLoading(true);
               await onSubmitSign(
+                fileName,
                 fileToSignRef,
                 setVerificationKey,
                 e,
-                setTransactionState
+                setTransactionState,
+                setJsonFileData
               );
               setIsSignerLoading(false);
             }
@@ -73,12 +76,23 @@ export const SignForm = () => {
             Signed Codes
           </button> */}
           {!isSignerLoading ? (
-            <div className="flex items-center justify-center">
+            <div className="flex flex-col items-center justify-center">
               <input
                 type="submit"
                 value="Submit"
                 className="bg-[#ff1818] rounded-[12px] py-2.5 px-5 hover:bg-[#1f1c1c] hover:shadow-lg my-2 font-bold text-white cursor-pointer duration-500 text-center max-w-min"
               />
+              {Object.entries(jsonFileData).length !== 0 && (
+                <a
+                  href={`data:text/plain;charset=utf-8,${JSON.stringify(
+                    jsonFileData
+                  )}`}
+                  className="text-base text-[#56582e] underline hover:text-yellow-800 "
+                  download="Document"
+                >
+                  Download Proof
+                </a>
+              )}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center my-2">
