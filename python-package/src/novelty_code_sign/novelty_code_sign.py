@@ -3,8 +3,8 @@ import requests
 from web3.auto import w3;
 # Signing
 # API function, calls /addSignature
-def add_signature(filename: str, signature: str, timestamp: str, user_address: str) -> dict:
-    post_data = {'filename': filename, 'signature': signature, 'timestamp': timestamp, 'userAddress': user_address} # this is a python dictionary https://www.w3schools.com/python/python_dictionaries.asp
+def add_signature(filename: str, signature: str, user_address: str) -> dict:
+    post_data = {'filename': filename, 'signature': signature, 'userAddress': user_address} # this is a python dictionary https://www.w3schools.com/python/python_dictionaries.asp
     req = requests.post('http://localhost:8080/addSignature', json=post_data); # we need to use json= if we don't requests will fail passing the data
     return req.json(); # https://requests.readthedocs.io/en/latest/user/quickstart/#json-response-content
 
@@ -18,10 +18,10 @@ def advanced_sign(file_data_in_bytes: bytes, private_key: str) -> str:
     return w3.toHex(w3.eth.account.sign_message(message, private_key=decoded_private_key).signature);
 
 # sign the message, sent it to server and get api response
-def easy_sign(file_path: str, filename: str, timestamp: str, user_address: str, private_key: str) -> dict:
+def easy_sign(file_path: str, filename: str, user_address: str, private_key: str) -> dict:
     file_data_in_bytes = file_to_bytes(file_path);
     signature = advanced_sign(file_data_in_bytes, private_key)
-    return add_signature(filename, signature, timestamp, user_address);
+    return add_signature(filename, signature, user_address);
 
 # verification
 # api function, calls /getTokenURI

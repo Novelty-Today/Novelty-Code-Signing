@@ -31,7 +31,6 @@ export const onSubmitSign = async (
       const response = await addSignature({
         filename: fileToSignRef.current!.files?.[0].name as string,
         signature,
-        timestamp: new Date().toUTCString(),
         userAddress: address,
       });
       setVerificationKey(response.tokenId);
@@ -84,7 +83,7 @@ export const onSubmitVerify = async (
       fileToVerifyRef.current?.files?.[0] as File
     );
     const msg = `0x${buffer.toString("hex")}`;
-    await window?.ethereum?.enable()
+    await window?.ethereum?.enable();
     const signedAddress = await window.ethereum.request({
       method: "personal_ecRecover",
       params: [msg, ipfsResponse.signature],
@@ -102,7 +101,6 @@ export const onSubmitVerify = async (
 const makeBufferFromFile = async (file: Blob) => {
   const dataArray = await file.arrayBuffer();
   return Buffer.from(dataArray);
-  
 };
 
 const getHashFromURI = (URI: string) => {
