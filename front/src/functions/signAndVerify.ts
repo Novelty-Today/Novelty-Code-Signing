@@ -77,7 +77,7 @@ export const onSubmitVerify = async (
     if (response.status === "error") throw Error("Invalid verification key");
 
     const ipfsHash = getHashFromURI(response.URI);
-    const ipfsResponse = (await axios.get(`https://dweb.link/ipfs/${ipfsHash}`))
+    const ipfsResponse = (await axios.get(`https://novelty.mypinata.cloud/ipfs/${ipfsHash}`))
       .data;
 
     const buffer = await makeBufferFromFile(
