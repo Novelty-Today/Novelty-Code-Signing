@@ -1,11 +1,10 @@
-import React from "react";
-import "./App.css";
-import { SignForm } from "./components/SignForm";
+import { Navigation } from "./components/Navigation/Navigation";
 
 function App() {
   return (
     <div className="font-base">
-      <SignForm />
+      <Navigation />
+      {/* <h1>123</h1> */}
     </div>
   );
 }
