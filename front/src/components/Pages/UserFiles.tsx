@@ -28,16 +28,13 @@ export const UserFiles = () => {
             return (
               <div
                 key={index}
-                className="shadow-[2px_2px_10px_0px_rgba(0,0,0,0.1)] h-[150px] rounded-[12px] bg-[#b8b8b80e] mb-4 p-3"
+                className="shadow-[2px_2px_10px_0px_rgba(0,0,0,0.1)] h-[150px] rounded-[12px] bg-[#b8b8b80e] mb-5 p-3"
               >
                 Name: {element?.filename}
                 <br />
                 Timestamp:{"      \t\t"}
                 {element?.timestamp}
                 <p className="break-words">Signature: {element?.signature}</p>
-                <br />
-                <br />
-                <br />
               </div>
             );
           })}
