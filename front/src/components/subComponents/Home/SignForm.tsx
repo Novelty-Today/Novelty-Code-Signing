@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useContext } from "react";
+import { useRef, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "../../UI/Spinner";
 import { FileSelector } from "./FileSelector";
@@ -35,9 +35,6 @@ export const SignForm = () => {
     }
   };
 
-  useEffect(() => {
-    console.log(fileName);
-  }, [fileName]);
   return (
     <div className="w-2/6 mx-auto flex flex-col gap-5 text-center">
       <div className="flex flex-col gap-[4px] p-5 border-solid border-black border-2 rounded-xl">
