@@ -1,7 +1,6 @@
 import { useRef, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "../../UI/Spinner";
-import { FileSelector } from "./FileSelector";
 import {
   onSubmitVerify,
   onSubmitSign,
@@ -68,7 +67,13 @@ export const SignForm = () => {
               else setFileName(e.target.value);
             }}
           />
-          <FileSelector ref={fileToSignRef} id="fileToSignId" />
+          <input
+            type="text"
+            className="w-full border-[1px] border-[#b8b8b8] text-[#545c5c] placeholder:font-normal placeholder:text-[14px] font-semibold focus:outline-none  px-[15px] py-[4px] focus:border-[#0404049a]"
+            placeholder="ipfs:// link to file"
+            ref={fileToSignRef}
+            id="fileToSignId"
+          />
           <button
             type="button"
             onClick={redirectToUserFilesHandler}
@@ -126,7 +131,13 @@ export const SignForm = () => {
           }}
           className="flex flex-col w-full gap-1"
         >
-          <FileSelector ref={fileToVerifyRef} id="fileToVerifyId" />
+          <input
+            type="text"
+            className="w-full border-[1px] border-[#b8b8b8] text-[#545c5c] placeholder:font-normal placeholder:text-[14px] font-semibold focus:outline-none  px-[15px] py-[4px] focus:border-[#0404049a]"
+            placeholder="ipfs:// link to file"
+            ref={fileToVerifyRef}
+            id="fileToVerifyId"
+          />
           <input
             type="text"
             ref={verificationKeyRef}

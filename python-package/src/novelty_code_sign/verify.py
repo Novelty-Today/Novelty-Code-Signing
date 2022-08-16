@@ -19,8 +19,8 @@ def get_data_from_token_uri(token_uri: str, gateway=constants.ipfs_gateway) -> d
     return req.json(); # https://requests.readthedocs.io/en/latest/user/quickstart/#json-response-content
 
 # get the address of whoever signed this message
-def advanced_verify(file_data_in_bytes: bytes, signature: str) -> str:
-    message = encode_defunct(file_data_in_bytes);
+def advanced_verify(ipfs_uri, signature: str) -> str:
+    message = encode_defunct(text=ipfs_uri);
     # there is a glitch with this library, when passing the signature it will fail verification.
     # in this code we extract v, r, and s value from the signature
     # this values are needed to recover the address
@@ -31,9 +31,8 @@ def advanced_verify(file_data_in_bytes: bytes, signature: str) -> str:
     return w3.eth.account.recover_message(message, vrs=(v, r, s));
 
 # verify that the appropriate data has been signed, token_id is the verification key
-def easy_verify(file_path: str, token_id: int) -> bool:
-    file_data_in_bytes = common.file_to_bytes(file_path);
+def easy_verify(ipfs_uri: str, token_id: int) -> bool:
     token_uri = get_token_uri(token_id)["URI"];
     data = get_data_from_token_uri(token_uri);
-    return advanced_verify(file_data_in_bytes, data["signature"]).lower() == data["userAddress"].lower(); # compare addresses in lowercase
+    return advanced_verify(ipfs_uri, data["signature"]).lower() == data["userAddress"].lower(); # compare addresses in lowercase
 

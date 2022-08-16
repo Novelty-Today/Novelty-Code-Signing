@@ -3,9 +3,5 @@
 # dependencies
 /node_modules
 
-# production
-/public
-
-
 # misc
 .DS_Store

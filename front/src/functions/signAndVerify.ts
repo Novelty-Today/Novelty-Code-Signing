@@ -15,26 +15,21 @@ export const onSubmitSign = async (
 ) => {
   try {
     e.preventDefault();
-    fileWarning(fileToSignRef);
+    ipfsWarning(fileToSignRef.current!.value);
+
+    const ipfsURI = fileToSignRef.current!.value;
 
     const address: string = await checkWebProviderAndConnect();
     if (!address) return;
 
-    const buffer = await makeBufferFromFile(
-      fileToSignRef.current?.files?.[0] as Blob
-    );
-
-    const msg = `0x${buffer.toString("hex")}`; // making our file content hexidecimal
-
     const signature: string = await window.ethereum.request({
       method: "personal_sign",
-      params: [msg, address, ""],
+      params: [ipfsURI, address, ""],
     });
     if (signature) {
       setTransactionState("Transaction is being approved");
       const requestBody = {
-        filename:
-          fileName || (fileToSignRef.current!.files?.[0].name as string),
+        filename: fileName || "Unknown File",
         signature,
         userAddress: address,
       };
@@ -78,33 +73,39 @@ export const onSubmitVerify = async (
   try {
     e.preventDefault();
     if (!/^[0-9]+$/.test(verificationKey)) {
-      throw Error("Invalid verification key");
+      throw new Error("Invalid verification key");
     }
-    fileWarning(fileToVerifyRef);
+
+    ipfsWarning(fileToVerifyRef.current!.value);
 
     const response = await getTokenURI(parseInt(verificationKey));
 
-    if (response.status === "error") throw Error("Invalid verification key");
+    if (response.status === "error")
+      throw new Error("Invalid verification key");
 
-    const ipfsHash = getHashFromURI(response.URI);
-    const ipfsResponse = (
-      await axios.get(`https://novelty.mypinata.cloud/ipfs/${ipfsHash}`)
+    const ipfsVerificationHash = getHashFromURI(response.URI);
+    const ipfsVerificationResponse = (
+      await axios.get(
+        `https://novelty.mypinata.cloud/ipfs/${ipfsVerificationHash}`
+      )
     ).data;
 
-    const buffer = await makeBufferFromFile(
-      fileToVerifyRef.current?.files?.[0] as File
-    );
-    const msg = `0x${buffer.toString("hex")}`;
     await window?.ethereum?.enable();
     const signedAddress = await window.ethereum.request({
       method: "personal_ecRecover",
-      params: [msg, ipfsResponse.signature],
+      params: [
+        fileToVerifyRef.current!.value,
+        ipfsVerificationResponse.signature,
+      ],
     });
-    if (signedAddress.toLowerCase() === ipfsResponse.userAddress.toLowerCase())
+    if (
+      signedAddress.toLowerCase() ===
+      ipfsVerificationResponse.userAddress.toLowerCase()
+    )
       alert(
         `Verification succeeded!\n${signedAddress} has signed this file.\n`
       );
-    else throw Error("Verification failed");
+    else throw new Error("Verification failed");
   } catch (error: any) {
     alert(error?.message);
   }
@@ -120,17 +121,8 @@ const getHashFromURI = (URI: string) => {
   return URI.slice(lastIndex + 1);
 };
 
-const fileWarning = (fileToVerifyRef: RefObject<HTMLInputElement>) => {
-  if (
-    !fileToVerifyRef.current!.files ||
-    fileToVerifyRef.current!.files.length === 0
-  ) {
-    throw Error("No file selected, please select a file to sign");
-  }
-  if (
-    fileToVerifyRef.current!.files &&
-    fileToVerifyRef.current!.files.length > 1
-  ) {
-    throw Error("Too many files selected, please select only a single file");
+const ipfsWarning = (ipfsURI: string) => {
+  if (!/^ipfs:\/\//.test(ipfsURI)) {
+    throw new Error("Invalid IPFS URI provided, URI must start with ipfs://");
   }
 };
