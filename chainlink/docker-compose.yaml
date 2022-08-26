@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:14.5-alpine
+    ports:
+      - 5432:5432
+    env_file:
+      - postgres.env
+    volumes:
+      - db-data:/var/lib/postgresql/data:z
+
+  chainlink:
+    build: .
+    env_file:
+      - chainlink.env
+    command: local node -p /chainlink/.password -a /chainlink/.api
+    restart: on-failure
+    ports:
+      - 6688:6688
+    links:
+      - postgres
+    depends_on:
+      - postgres
+    volumes:
+      - chainlink_data:/chainlink
+
+  verifier:
+    image: verifier:latest
+    ports:
+      - 4040:4040
+
+volumes:
+  db-data:
+  chainlink_data:
