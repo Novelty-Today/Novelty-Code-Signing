@@ -2,10 +2,12 @@ import axios from "axios";
 import { API_CONFIG } from "../constants";
 
 interface RequestBodyInput {
-  signature: string;
   proof: string;
   publicAddress: string;
   jwtToken: string;
+  signature_v: string;
+  signature_r: string;
+  signature_s: string;
 }
 
 export async function addPublicAddress(requestBody: RequestBodyInput) {

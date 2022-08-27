@@ -25,10 +25,10 @@ def advanced_verify(ipfs_uri, signature: str) -> str:
     # in this code we extract v, r, and s value from the signature
     # this values are needed to recover the address
     # if you are confused by [:] operator: https://stackoverflow.com/a/663175
-    r = signature[0:66];
-    s = "0x{}".format(signature[66:130]);
-    v = "0x{}".format(signature[130:132]);
-    return w3.eth.account.recover_message(message, vrs=(v, r, s));
+    signature_v = "0x{}".format(signature[130:132]);
+    signature_r = signature[0:66];
+    signature_s = "0x{}".format(signature[66:130]);
+    return w3.eth.account.recover_message(message, vrs=(signature_v, signature_r, signature_s));
 
 # verify that the appropriate data has been signed, token_id is the verification key
 def easy_verify(ipfs_uri: str, token_id: int) -> bool:
