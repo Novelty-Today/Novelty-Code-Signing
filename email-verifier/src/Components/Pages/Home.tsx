@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { addPublicAddress } from "../../API/addPublicAddress";
+import { useNavigate } from "react-router-dom";
 import GoogleAuth from "../UI/GoogleAuth";
 
 export const Home = () => {
@@ -13,18 +14,25 @@ export const Home = () => {
   };
   useEffect(() => {
     if (
-      !searchParams.get("signature") ||
+      !searchParams.get("signature_v") ||
+      !searchParams.get("signature_r") ||
+      !searchParams.get("signature_s") ||
       !searchParams.get("proof") ||
       !searchParams.get("publicAddress")
     ) {
       setErrored(true);
     }
   }, []);
+
+  const navigate = useNavigate();
+
   useEffect(() => {
     try {
       if (googleJwtToken) {
         const requestBody = {
-          signature: searchParams.get("signature") || "",
+          signature_v: searchParams.get("signature_v") || "",
+          signature_r: searchParams.get("signature_r") || "",
+          signature_s: searchParams.get("signature_s") || "",
           proof: searchParams.get("proof") || "",
           publicAddress: searchParams.get("publicAddress") || "",
           jwtToken: googleJwtToken,
@@ -32,7 +40,9 @@ export const Home = () => {
 
         (async () => {
           const serverResponse = await addPublicAddress(requestBody);
-          console.log(serverResponse);
+          if (serverResponse.status === "success") {
+            navigate("/success");
+          }
         })();
       }
     } catch (Err) {}
