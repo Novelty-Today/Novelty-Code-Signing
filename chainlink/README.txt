@@ -19,9 +19,14 @@ you can get goerli ETH at https://goerlifaucet.com
 you can get testnet LINK by following this tutorial https://docs.chain.link/docs/acquire-link/
 
 after you have done this you will need to deploy oracle for the contracts to work.
-you can deploy an oracle by following this tutorial
-https://docs.chain.link/docs/fulfilling-requests/ (instructions about deploying oracle are before "add job to node chapter")
-make sure to use goerli testnet.
+to deploy oracle:
+open https://remix.ethereum.org/#url=https://docs.chain.link/samples/NodeOperators/Oracle.sol in your webbrowser.
+from the deployment drop down menu: select Oracle.
+deploy the oracle using 0.6.6 solidity compiler on geoerli testnet.
+after deployment, go to your chainlink node ui and copy the address.
+call setFulfulmentPermisons on oracle contract with the address you copied as the first parameter and true as the second parameter, if you skip this step than chainlink node will silently fail.
+you can read more about this topic from official documentation:
+https://docs.chain.link/docs/fulfilling-requests/
 
 in chainlink node ui, go to bridges,
 create bridge with name "verifier" and url http://verifier:4040/verifyJWT

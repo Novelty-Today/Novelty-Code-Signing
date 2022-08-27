@@ -18,10 +18,10 @@ router.post(
         res.status(200).send({ status: "error" });
         return;
       }
-
       res.status(200).send({
         status: "success",
       });
+      console.log(req.body);
     } catch (error) {
       console.log(error);
       res.sendStatus(404);
