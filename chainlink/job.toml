@@ -13,7 +13,8 @@ observationSource = """
     decode_cbor  [type=cborparse data="$(decode_log.data)"]
     fetch        [type=bridge name="verifier" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": { \\"jwt\\": $(decode_cbor.jwt) \\"email\\": $(decode_cbor.email), \\"proof\\": $(decode_cbor.proof), \\"publicAddress\\": $(decode_cbor.publicAddress)}}"]
     parse_verified [type=jsonparse path="data,verified" data="$(fetch)"]
-    parse_proof    [type=jsonparse path="data,proof" data="$(fetch)"] tparse_email    [type=jsonparse path="data,email" data="$(fetch)"]
+    parse_proof    [type=jsonparse path="data,proof" data="$(fetch)"] 
+    parse_email    [type=jsonparse path="data,email" data="$(fetch)"]
     parse_publicAddress [type=jsonparse path="data,publicAddress" data="$(fetch)"]
     encode_data  [type=ethabiencode abi="(string _email, bytes32 _proof, address _publicAddress)" data="{ \\"_email\\": $(parse_email), \\"_proof\\": $(parse_proof), \\"_publicAddress\\": $(parse_publicAddress) }"]
     encode_tx    [type=ethabiencode
