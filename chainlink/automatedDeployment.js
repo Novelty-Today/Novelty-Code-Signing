@@ -41,7 +41,7 @@ const insertOracleAddress = async () => {
     data = JSON.parse(data);
     jobToml = jobToml.replaceAll("%oracle%", data?.ORACLE_ADDRESS);
     fs.writeFileSync("./job.toml", jobToml.toString());
-    console.log("please copy job.toml and paste it into UI");
+    console.log("please copy job.toml and paste it into UI to create new job");
   } catch (err) {
     console.error(err);
   }
