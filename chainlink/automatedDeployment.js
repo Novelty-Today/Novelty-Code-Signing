@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const promptSync = require("prompt-sync");
 const { exec } = require("child_process");
+const { resolve } = require("path");
 
 const prompt = promptSync();
 
@@ -53,9 +54,8 @@ const copyJob = async () => {
 const changeJobId = async () => {
   try {
     let jobId = prompt("Please, enter jobId: ");
-    let data = fs.readFileSync("./jobId.json", "utf8");
-    data = JSON.parse(data);
-    data.JOB_ID = jobId.replaceAll("-", "");
+    let data = {};
+    data["JOB_ID"] = jobId.replaceAll("-", "");
     fs.writeFileSync("./jobId.json", JSON.stringify(data));
   } catch (err) {
     console.error(err);
@@ -74,12 +74,34 @@ const deployIdentitySC = async () => {
   }
 };
 
+const copyFiles = async () => {
+  fs.copyFileSync(
+    path.resolve(__dirname, "./constants.json"),
+    path.resolve(__dirname, "./../back/chainlink_external/constants.json")
+  );
+  fs.copyFileSync(
+    path.resolve(__dirname, "./identity_constants.json"),
+    path.resolve(
+      __dirname,
+      "./../back/chainlink_external/identity_constants.json"
+    )
+  );
+  fs.copyFileSync(
+    path.resolve(
+      __dirname,
+      "./artifacts/contracts/IdentityStore.sol/IdentityStore.json"
+    ),
+    path.resolve(__dirname, "./../back/chainlink_external/IdentityStore.json")
+  );
+};
+
 const automatedDeployment = async () => {
   await deployOracleSC();
   await insertOracleAddress();
   await copyJob();
   await changeJobId();
   await deployIdentitySC();
+  await copyFiles();
 };
 
 automatedDeployment();
