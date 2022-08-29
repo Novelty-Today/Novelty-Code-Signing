@@ -13,7 +13,6 @@ contract IdentityStore is ChainlinkClient, ConfirmedOwner {
     using Chainlink for Chainlink.Request;
 
     IdentityStoreEntry[] private arr;
-    address private oracle;
     string[] private usedJWTs;
     bytes32 private jobId;
     uint256 private fee;
@@ -56,6 +55,10 @@ contract IdentityStore is ChainlinkClient, ConfirmedOwner {
             "address from signature and _publicAddress do not match"
         );
 
+        for (uint256 i = 0; i < usedJWTs.length; i++) {
+            require(usedJWTs != jwt, "JWT cannot be reused");
+        }
+
         usedJWTs.push(jwt);
         // verify jwt here
         Chainlink.Request memory req = buildChainlinkRequest(
@@ -76,18 +79,20 @@ contract IdentityStore is ChainlinkClient, ConfirmedOwner {
         bytes32 _proof,
         address _publicAddress
     ) public recordChainlinkFulfillment(_requestId) {
-        IdentityStoreEntry memory data;
-        data.email = _email;
-        data.proof = _proof;
-        data.publicAddress = _publicAddress;
-        data.blockId = block.number;
-        arr.push(data);
+        if (_publicAddress != address(0)) {
+            IdentityStoreEntry memory data;
+            data.email = _email;
+            data.proof = _proof;
+            data.publicAddress = _publicAddress;
+            data.blockId = block.number;
+            arr.push(data);
+        }
     }
 
-        function getEmailFromPublicAddress(address _publicAddress)
-        public
-        view
-        returns (string memory)
+    function getEmailFromPublicAddress(address _publicAddress)
+    public
+    view
+    returns (string memory)
     {
         for (uint256 i = 0; i < arr.length; i++) {
             if (arr[i].publicAddress == _publicAddress) return arr[i].email;
