@@ -4,7 +4,8 @@
   "description": "in this folder chainlink related data is stored. note that for this to work, you will need to build verifierServer's docker image and tag it. cd ../verifierServer/ sudo docker build -t verifier .",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy-contracts": "node ./automatedDeployment.js"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +15,7 @@
     "@nomiclabs/hardhat-ethers": "^2.1.1",
     "dotenv": "^16.0.1",
     "ethers": "^5.7.0",
-    "hardhat": "^2.10.2"
+    "hardhat": "^2.10.2",
+    "prompt-sync": "^4.2.0"
   }
 }

@@ -2,7 +2,7 @@ type = "directrequest"
 schemaVersion = 1
 name = ""
 maxTaskDuration = "0s"
-contractAddress = "0x1fb43bBC0975CFd306819D8b4d6ccfb9b37543E5"
+contractAddress = "%oracle%"
 minContractPaymentLinkJuels = "0"
 observationSource = """
     decode_log   [type=ethabidecodelog
@@ -12,6 +12,7 @@ observationSource = """
 
     decode_cbor  [type=cborparse data="$(decode_log.data)"]
     fetch        [type=bridge name="verifier" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": { \\"jwt\\": $(decode_cbor.jwt) \\"email\\": $(decode_cbor.email), \\"proof\\": $(decode_cbor.proof), \\"publicAddress\\": $(decode_cbor.publicAddress)}}"]
+    parse_verified [type=jsonparse path="data,verified" data="$(fetch)"]
     parse_proof    [type=jsonparse path="data,proof" data="$(fetch)"] 
     parse_email    [type=jsonparse path="data,email" data="$(fetch)"]
     parse_publicAddress [type=jsonparse path="data,publicAddress" data="$(fetch)"]
@@ -20,7 +21,7 @@ observationSource = """
                   abi="fulfillOracleRequest(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes32 data)"
                   data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
                  ]
-    submit_tx    [type=ethtx to="0x1fb43bBC0975CFd306819D8b4d6ccfb9b37543E5" data="$(encode_tx)"]
+    submit_tx    [type=ethtx to="%oracle%" data="$(encode_tx)"]
 
-    decode_log -> decode_cbor -> fetch -> parse_proof -> parse_email -> parse_publicAddress -> encode_data -> encode_tx -> submit_tx
+    decode_log -> decode_cbor -> fetch -> parse_verified -> parse_proof -> parse_email -> parse_publicAddress -> encode_data -> encode_tx -> submit_tx
 """

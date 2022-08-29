@@ -1,9 +1,12 @@
-const data = require("../constants.json");
-const { LINK_NODE_ADDRESS, LINK_TOKEN_ADDRESS, JOB_ID } = data;
-const oracleData = require("../oracle_constants.json");
-const { ORACLE_ADDRESS } = oracleData;
 const fs = require("fs");
 
+const data = require("../constants.json");
+const oracleData = require("../oracle_constants.json");
+const jobId = require("../jobId.json");
+
+const { LINK_TOKEN_ADDRESS } = data;
+const { ORACLE_ADDRESS } = oracleData;
+const { JOB_ID } = jobId;
 async function main() {
   // Deploying IdentityStore Contract
   const IdentityStore = await ethers.getContractFactory("IdentityStore");

@@ -6,6 +6,7 @@
 
 # production
 /build
+/chainlink/cache
 
 # misc
 .DS_Store
@@ -16,3 +17,8 @@
 
 # Immutable X
 /src/Solidity/scripts/imx-examples
+
+# constants
+/chainlink/constants.json
+/chainlink/identity_constants.json
+/chainlink/oracle_constants.json
