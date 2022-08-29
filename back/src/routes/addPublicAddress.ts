@@ -1,5 +1,11 @@
 import { Router, Request, Response } from "express";
 import jwt_decode from "jwt-decode";
+import web3 from "../Solidity/scripts/ReferenceObjects";
+
+const {
+  USER_CONTRACT_ADDRESS,
+} = require("../../chainlink/identity_constants.json");
+const IdentityStore = require("../../chainlink/artifacts/IdentityStore.json");
 
 export interface AddPublicAddressInput {
   signature_v: string;
@@ -13,14 +19,20 @@ export interface AddPublicAddressInput {
 const router = Router();
 
 const addIdentityStoreEntry = (
-  _email: string,
-  _proof: string,
-  _publicAddress: string,
-  _jwtToken: string,
-  _signature_v: string,
-  _signature_r: string,
-  _signature_s: string
-) => {};
+  email: string,
+  proof: string,
+  publicAddress: string,
+  jwtToken: string,
+  signature_v: string,
+  signature_r: string,
+  signature_s: string
+) => {
+  const identityStoreContract = new web3.eth.Contract(
+    IdentityStore.abi,
+    USER_CONTRACT_ADDRESS
+  );
+  identityStoreContract
+};
 
 router.post(
   "/addPublicAddress",
