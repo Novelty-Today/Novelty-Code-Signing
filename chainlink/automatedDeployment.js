@@ -17,7 +17,6 @@ const sh = async (cmd) => {
   });
 };
 
-// in chainlink folder npx hardhat run ./scripts/deploy-oracle.js
 // 1. Deploy Oracle smart contract.
 const deployOracleSC = async () => {
   try {
@@ -30,7 +29,7 @@ const deployOracleSC = async () => {
   }
 };
 
-// 2. insert Oracle Address into job.toml file and copy job.toml's content to clipboard
+// 2. insert Oracle Address into job.toml file
 const insertOracleAddress = async () => {
   try {
     let data = fs.readFileSync("./oracle_constants.json", "utf8");
@@ -47,7 +46,6 @@ const insertOracleAddress = async () => {
   }
 };
 
-// 3.
 const changeJobId = async () => {
   try {
     let jobId = prompt("Please, enter jobId: ");
@@ -60,8 +58,7 @@ const changeJobId = async () => {
   }
 };
 
-// in chainlink folder npx hardhat run ./scripts/deploy-oracle.js
-// 1. Deploy Oracle smart contract.
+// 1. Deploy identity smart contract.
 const deployIdentitySC = async () => {
   try {
     const deployIdentity = await sh(
@@ -81,5 +78,3 @@ const automatedDeployment = async () => {
 };
 
 automatedDeployment();
-
-// module.exports = automatedDeployment;
