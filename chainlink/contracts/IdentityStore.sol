@@ -56,7 +56,7 @@ contract IdentityStore is ChainlinkClient, ConfirmedOwner {
         );
 
         for (uint256 i = 0; i < usedJWTs.length; i++) {
-            require(usedJWTs != jwt, "JWT cannot be reused");
+            require(keccak256(bytes(usedJWTs[i])) != keccak256(bytes(jwt)), "JWT cannot be reused");
         }
 
         usedJWTs.push(jwt);

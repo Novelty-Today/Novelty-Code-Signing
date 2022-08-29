@@ -20,9 +20,7 @@ const sh = async (cmd) => {
 // 1. Deploy Oracle smart contract.
 const deployOracleSC = async () => {
   try {
-    const deployOracle = await sh(
-      `npx hardhat run .\\scripts\\deployOracle.js `
-    );
+    const deployOracle = await sh(`npx hardhat run ./scripts/deployOracle.js `);
     console.log("deployOracle", deployOracle);
   } catch (err) {
     console.error(err);
@@ -40,10 +38,16 @@ const insertOracleAddress = async () => {
     data = JSON.parse(data);
     jobToml = jobToml.replaceAll("%oracle%", data?.ORACLE_ADDRESS);
     fs.writeFileSync("./job.toml", jobToml.toString());
-    console.log("please copy job.toml and paste it into UI to create new job");
   } catch (err) {
     console.error(err);
   }
+};
+
+const copyJob = async () => {
+  await sh("node clipboard-job.mjs");
+  console.log(
+    "Content of job.toml copied, please create a job in chainlink WebUI"
+  );
 };
 
 const changeJobId = async () => {
@@ -62,7 +66,7 @@ const changeJobId = async () => {
 const deployIdentitySC = async () => {
   try {
     const deployIdentity = await sh(
-      `npx hardhat run .\\scripts\\deployIdentity.js `
+      `npx hardhat run ./scripts/deployIdentity.js `
     );
     console.log("deployIdentity", deployIdentity);
   } catch (err) {
@@ -73,6 +77,7 @@ const deployIdentitySC = async () => {
 const automatedDeployment = async () => {
   await deployOracleSC();
   await insertOracleAddress();
+  await copyJob();
   await changeJobId();
   await deployIdentitySC();
 };
