@@ -6,6 +6,7 @@
 
 # production
 /build
+/chainlink/cache
 
 # misc
 .DS_Store
