@@ -37,7 +37,6 @@ app.post(
 			res.status(200).send({
 				id: req.body.id,
 				data: {
-					verified: true,
 					proof: req.body.proof,
 					email: email,
 					publicAddress: req.body.publicAddress,
@@ -47,7 +46,6 @@ app.post(
 			res.status(200).send({
 				id: req.body.id,
 				data: {
-					verified: false,
 					proof: "0x0000000000000000000000000000000000000000000000000000000000000000",
 					email: email,
 					publicAddress: "0x0000000000000000000000000000000000000000",
