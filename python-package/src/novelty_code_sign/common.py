@@ -13,12 +13,12 @@ def get_address_from_private_key(private_key: str) -> str:
 
 def upload_file_to_pinata(file_path: str, filename: str, pinata_jwt: str):
     url = "https://api.pinata.cloud/pinning/pinFileToIPFS";
-    payload={'pinataOptions': '{"cidVersion": 1}', 'pinataMetadata': '{{"name": "{}"}}'.format(filename)};
+    payload={'pinataOptions': '{"cidVersion": 1}', 'pinataMetadata': f'{{"name": "{filename}"}}'};
     files=[
         ('file',("file", open(file_path,'rb'), 'application/octet-stream'))
     ];
     headers = {
-      'Authorization': 'Bearer {}'.format(pinata_jwt)
+      'Authorization': f'Bearer {pinata_jwt}'
     };
     response = requests.request("POST", url, headers=headers, data=payload, files=files)
-    return "ipfs://{}".format(response.json()["IpfsHash"]);
+    return f'ipfs://{response.json()["IpfsHash"]}';

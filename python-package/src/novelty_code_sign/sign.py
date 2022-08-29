@@ -7,7 +7,7 @@ from . import constants;
 # API function, calls /addSignature
 def add_signature(filename: str, signature: str, user_address: str, ipfs_uri) -> dict:
     post_data = {'filename': filename, 'signature': signature, 'userAddress': user_address, 'IpfsURI': ipfs_uri } # this is a python dictionary https://www.w3schools.com/python/python_dictionaries.asp
-    req = requests.post('{}/addSignature'.format(constants.api_url), json=post_data); # we need to use json= if we don't requests will fail passing the data
+    req = requests.post(f'{constants.api_url}/addSignature', json=post_data); # we need to use json= if we don't requests will fail passing the data
     return req.json(); # https://requests.readthedocs.io/en/latest/user/quickstart/#json-response-content
 
 # simply sign the message without connecting to any server

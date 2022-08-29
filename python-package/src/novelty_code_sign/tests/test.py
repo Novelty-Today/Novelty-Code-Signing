@@ -7,5 +7,5 @@ import json;
 
 file = open("./keys.json", "r");
 data = json.load(file);
-private_key = "0x{}".format(data["private_key"]);
+private_key = f'0x{data["private_key"]}';
 novelty_associate.associate_public_key(data["private_key"]);
