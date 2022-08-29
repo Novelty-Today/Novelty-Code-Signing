@@ -6,7 +6,7 @@
 
 # production
 /build
-/chainlink/cache
+/cache
 
 # misc
 .DS_Store
@@ -19,6 +19,8 @@
 /src/Solidity/scripts/imx-examples
 
 # constants
-/chainlink/constants.json
-/chainlink/identity_constants.json
-/chainlink/oracle_constants.json
+/constants.json
+/identity_constants.json
+/oracle_constants.json
+/jobId.json
+/job.toml
