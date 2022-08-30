@@ -11,8 +11,7 @@ observationSource = """
                   topics="$(jobRun.logTopics)"]
 
     decode_cbor  [type=cborparse data="$(decode_log.data)"]
-    fetch        [type=bridge name="verifier" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": { \\"jwt\\": $(decode_cbor.jwt) \\"email\\": $(decode_cbor.email), \\"proof\\": $(decode_cbor.proof), \\"publicAddress\\": $(decode_cbor.publicAddress)}}"]
-    parse_verified [type=jsonparse path="data,verified" data="$(fetch)"]
+    fetch        [type=bridge name="verifier" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": { \\"jwt\\": $(decode_cbor.jwt), \\"email\\": $(decode_cbor.email), \\"proof\\": $(decode_cbor.proof), \\"publicAddress\\": $(decode_cbor.publicAddress)}}"]
     parse_proof    [type=jsonparse path="data,proof" data="$(fetch)"] 
     parse_email    [type=jsonparse path="data,email" data="$(fetch)"]
     parse_publicAddress [type=jsonparse path="data,publicAddress" data="$(fetch)"]
@@ -23,5 +22,5 @@ observationSource = """
                  ]
     submit_tx    [type=ethtx to="%oracle%" data="$(encode_tx)"]
 
-    decode_log -> decode_cbor -> fetch -> parse_verified -> parse_proof -> parse_email -> parse_publicAddress -> encode_data -> encode_tx -> submit_tx
+    decode_log -> decode_cbor -> fetch -> parse_proof -> parse_email -> parse_publicAddress -> encode_data -> encode_tx -> submit_tx
 """
