@@ -3,19 +3,18 @@ const {
   infuraProviderHTTPS,
   signerPublicKey,
   signerPrivateKey,
-  IdentityContractAddress,
 } = require("../constants");
-const ABI = require("./identityStoreABI");
+const backConstants = require("../chainlink_external/chainlinkConstants");
 
 const web3 = new Web3();
 web3.setProvider(new Web3.providers.HttpProvider(infuraProviderHTTPS));
 
-const createTransaction = async (identityConractAddress, transactionData) => {
+const createTransaction = async (transactionData) => {
   const nonce = await web3.eth.getTransactionCount(signerPublicKey, "latest"); //get latest nonce
   const tx = {
     from: signerPublicKey,
-    to: identityConractAddress,
-    nonce: nonce,
+    to: backConstants?.IDENTITY_CONTRACT_ADDRESS,
+    nonce,
     gas: 2000000,
     data: transactionData,
   };
@@ -34,8 +33,10 @@ const getTxData = (contract, method, args) => {
   return contract.methods[method](...args).encodeABI();
 };
 
-const createSignSendTx = async (identityConractAddress, transactionData) => {
-  const tx = await createTransaction(identityConractAddress, transactionData);
+const createSignSendTx = async (transactionData) => {
+  const tx = await createTransaction(
+    transactionData
+  );
   const signedTx = await signTransaction(tx);
   return sendTransaction(signedTx, textOutput);
 };
@@ -46,9 +47,12 @@ const textOutput = (err, hash) => {
     console.log("Something went wrong when submitting your transaction:", err);
   }
 };
-const identityContract = new web3.eth.Contract(ABI, IdentityContractAddress);
+const identityContract = new web3.eth.Contract(
+  backConstants?.IDENTITY_CONTRACT_ABI,
+  backConstants?.IDENTITY_CONTRACT_ADDRESS
+);
 
-const runTestFunction = async ({
+const runAddIdentityStoreEntry = async ({
   _email,
   _proof,
   _publicAddress,
@@ -72,8 +76,10 @@ const runTestFunction = async ({
       ]
     );
 
-    return await createSignSendTx(IdentityContractAddress, transactionData);
+    return await createSignSendTx(
+      transactionData
+    );
   } catch (Err) {}
 };
 
-module.exports = { runTestFunction };
+module.exports = { runAddIdentityStoreEntry };

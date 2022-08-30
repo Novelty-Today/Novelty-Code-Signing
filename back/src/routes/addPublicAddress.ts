@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import jwt_decode from "jwt-decode";
-import { runTestFunction } from "../functions/addIdentityAlchemy";
+import { runAddIdentityStoreEntry } from "../functions/addIdentityAlchemy";
 
 export interface AddPublicAddressInput {
   signature_v: string;
@@ -31,7 +31,7 @@ router.post(
       }
       const email: string = (jwt_decode(jwtToken) as any).email;
 
-      await runTestFunction({
+      await runAddIdentityStoreEntry({
         _email: email,
         _proof:
           "0x" +
