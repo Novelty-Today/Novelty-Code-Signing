@@ -76,23 +76,34 @@ const deployIdentitySC = async () => {
 };
 
 const copyFiles = async () => {
-  fs.copyFileSync(
+  let constantsJSON = fs.readFileSync(
     path.resolve(__dirname, "./constants.json"),
-    path.resolve(__dirname, "./../back/chainlink_external/constants.json")
+    "utf8"
   );
-  fs.copyFileSync(
+  let identityConstants = fs.readFileSync(
     path.resolve(__dirname, "./identity_constants.json"),
-    path.resolve(
-      __dirname,
-      "./../back/chainlink_external/identity_constants.json"
-    )
+    "utf8"
   );
-  fs.copyFileSync(
+  let identityABI = fs.readFileSync(
     path.resolve(
       __dirname,
       "./artifacts/contracts/IdentityStore.sol/IdentityStore.json"
     ),
-    path.resolve(__dirname, "./../back/chainlink_external/IdentityStore.json")
+    "utf8"
+  );
+  identityABI = JSON.parse(identityABI);
+  identityConstants = JSON.parse(identityConstants);
+  constantsJSON = JSON.parse(constantsJSON);
+  constantsJSON["IDENTITY_CONTRACT_ADDRESS"] =
+    identityConstants.USER_CONTRACT_ADDRESS;
+  constantsJSON["IDENTITY_CONTRACT_ABI"] = identityABI.abi;
+  fs.writeFileSync(
+    "../back/src/chainlink_external/chainlinkConstants.js",
+    "const backConstants =".concat(
+      " ",
+      JSON.stringify(constantsJSON),
+      "; module.exports = backConstants;"
+    )
   );
 };
 
