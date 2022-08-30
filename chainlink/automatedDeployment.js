@@ -21,6 +21,7 @@ const sh = async (cmd) => {
 // 1. Deploy Oracle smart contract.
 const deployOracleSC = async () => {
   try {
+    console.log("Deploying oracle smart contract...");
     const deployOracle = await sh(`npx hardhat run ./scripts/deployOracle.js `);
     console.log("deployOracle", deployOracle);
   } catch (err) {

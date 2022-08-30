@@ -1,11 +1,6 @@
 import { Router, Request, Response } from "express";
 import jwt_decode from "jwt-decode";
-import web3 from "../Solidity/scripts/ReferenceObjects";
-
-const {
-  USER_CONTRACT_ADDRESS,
-} = require("../../chainlink/identity_constants.json");
-const IdentityStore = require("../../chainlink/artifacts/IdentityStore.json");
+import { runTestFunction } from "../functions/addIdentityAlchemy";
 
 export interface AddPublicAddressInput {
   signature_v: string;
@@ -17,22 +12,6 @@ export interface AddPublicAddressInput {
 }
 
 const router = Router();
-
-const addIdentityStoreEntry = (
-  email: string,
-  proof: string,
-  publicAddress: string,
-  jwtToken: string,
-  signature_v: string,
-  signature_r: string,
-  signature_s: string
-) => {
-  const identityStoreContract = new web3.eth.Contract(
-    IdentityStore.abi,
-    USER_CONTRACT_ADDRESS
-  );
-  identityStoreContract
-};
 
 router.post(
   "/addPublicAddress",
@@ -51,22 +30,31 @@ router.post(
         return;
       }
       const email: string = (jwt_decode(jwtToken) as any).email;
-      addIdentityStoreEntry(
-        email,
-        proof,
-        publicAddress,
-        jwtToken,
+
+      await runTestFunction({
+        _email: email,
+        _proof:
+          "0x" +
+          proof
+            .split("")
+            .reduce(
+              (prev: string, cur: string) =>
+                prev + cur.charCodeAt(0).toString(16),
+              ""
+            ),
+        _publicAddress: publicAddress,
+        jwt: jwtToken,
         signature_v,
         signature_r,
-        signature_s
-      );
+        signature_s,
+      });
       res.status(200).send({
         status: "success",
       });
       console.log(req.body);
     } catch (error) {
       console.log(error);
-      res.sendStatus(404);
+      res.status(200).send({ status: "failed" });
     }
   }
 );
