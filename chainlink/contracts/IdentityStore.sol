@@ -95,7 +95,7 @@ contract IdentityStore is ChainlinkClient, ConfirmedOwner {
     returns (string memory)
     {
         for (uint256 i = 0; i < arr.length; i++) {
-            if (arr[i].publicAddress == _publicAddress) return arr[i].email;
+            if (arr[arr.length - 1 - i].publicAddress == _publicAddress) return arr[i].email;
         }
         return "";
     }

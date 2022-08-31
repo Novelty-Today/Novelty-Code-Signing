@@ -5,8 +5,11 @@ const { LINK_NODE_ADDRESS, LINK_TOKEN_ADDRESS } = data;
 
 async function main() {
   // 1) Deploying Oracle
-  const Oracle = await ethers.getContractFactory("Oracle");
-  const oracle = await Oracle.deploy(`0x${LINK_TOKEN_ADDRESS}`); // inject link token contract address
+  const Oracle = await ethers.getContractFactory("Operator");
+  const oracle = await Oracle.deploy(
+    `0x${LINK_TOKEN_ADDRESS}`,
+    "0xA4faFa5523F63EE58aE7b56ad8EB5a344A19F266"
+  ); // inject link token contract address
   await oracle.deployed();
   console.log("oracle deployed with address", oracle.address);
   putAddressToEnvOracle("ORACLE_ADDRESS", oracle.address);
@@ -14,10 +17,7 @@ async function main() {
   console.log(
     "next we set oracle setFulfillmentPermission function: here we need to indicate node address"
   );
-  const tx = await oracle.setFulfillmentPermission(
-    `0x${LINK_NODE_ADDRESS}`,
-    true
-  );
+  const tx = await oracle.setAuthorizedSenders([`0x${LINK_NODE_ADDRESS}`]);
   console.log({ tx });
 }
 

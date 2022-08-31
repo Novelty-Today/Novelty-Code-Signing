@@ -1,6 +1,8 @@
 from eth_account.messages import encode_defunct
 import requests
-from web3.auto import w3;
+from web3.auto import w3
+
+from . import associate_gmail;
 from . import constants;
 
 # api function, calls /getTokenURI
@@ -33,4 +35,7 @@ def easy_verify(ipfs_uri: str, token_id: int) -> bool:
     token_uri = get_token_uri(token_id)["URI"];
     data = get_data_from_token_uri(token_uri);
     return advanced_verify(ipfs_uri, data["signature"]).lower() == data["userAddress"].lower(); # compare addresses in lowercase
-
+def easy_verify_email(ipfs_uri: str, token_id: int, email: str) -> bool:
+    token_uri = get_token_uri(token_id)["URI"];
+    data = get_data_from_token_uri(token_uri);
+    return advanced_verify(ipfs_uri, data["signature"]).lower() == data["userAddress"].lower() and email.lower() == associate_gmail.get_email_from_address(data["userAddress"]).lower(); # compare addresses in lowercase

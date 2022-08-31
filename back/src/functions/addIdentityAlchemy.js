@@ -34,9 +34,7 @@ const getTxData = (contract, method, args) => {
 };
 
 const createSignSendTx = async (transactionData) => {
-  const tx = await createTransaction(
-    transactionData
-  );
+  const tx = await createTransaction(transactionData);
   const signedTx = await signTransaction(tx);
   return sendTransaction(signedTx, textOutput);
 };
@@ -76,10 +74,17 @@ const runAddIdentityStoreEntry = async ({
       ]
     );
 
-    return await createSignSendTx(
-      transactionData
-    );
+    return await createSignSendTx(transactionData);
   } catch (Err) {}
 };
 
-module.exports = { runAddIdentityStoreEntry };
+const runGetEmailFromPublicAddress = async (_email) => {
+  try {
+    const result = identityContract.methods
+      .getEmailFromPublicAddress(_email)
+      .call();
+    return result;
+  } catch (Err) {}
+};
+
+module.exports = { runAddIdentityStoreEntry, runGetEmailFromPublicAddress };

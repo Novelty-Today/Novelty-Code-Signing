@@ -2,7 +2,7 @@ export const contractAddress = "0x4ec410f93686df69da5629532d60a8Ec97725059";
 // "0xD240d3C19E45B9D947F1E46D89F5e67090134D09";
 
 export const IdentityContractAddress =
-  "0xB958160ffe81D8D62C3C21d4E579627590dd7542";
+  "0xBacD30857D7E9B59f0d3905324d34f700A679426";
 
 export const signerPublicKey = "0xA4faFa5523F63EE58aE7b56ad8EB5a344A19F266";
 export const signerPrivateKey =
