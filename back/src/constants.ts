@@ -1,5 +1,5 @@
-export const contractAddress = "0x961c1584772A7699bE5f15D20fB915ca9Ab0a25A";
-// "0x4ec410f93686df69da5629532d60a8Ec97725059";
+export const contractAddress = "0x4ec410f93686df69da5629532d60a8Ec97725059";
+// "0xD240d3C19E45B9D947F1E46D89F5e67090134D09";
 
 export const IdentityContractAddress =
   "0xB958160ffe81D8D62C3C21d4E579627590dd7542";
