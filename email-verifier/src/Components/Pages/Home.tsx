@@ -3,11 +3,13 @@ import { useSearchParams } from "react-router-dom";
 import { addPublicAddress } from "../../API/addPublicAddress";
 import { useNavigate } from "react-router-dom";
 import GoogleAuth from "../UI/GoogleAuth";
+import { Spinner } from "../UI/Spinner";
 
 export const Home = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [googleJwtToken, setGoogleJwtToken] = useState("");
   const [errored, setErrored] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const setGoogleJwtTokenHandler = (response: string) => {
     setGoogleJwtToken(response);
@@ -39,7 +41,9 @@ export const Home = () => {
         };
 
         (async () => {
+          setIsLoading(true);
           const serverResponse = await addPublicAddress(requestBody);
+          setIsLoading(false);
           if (serverResponse.status === "success") {
             navigate("/success");
           }
@@ -55,7 +59,11 @@ export const Home = () => {
           <h1 className="text-4xl font-bold text-[#3d61ff]">
             Sign In With Google
           </h1>
-          <GoogleAuth setGoogleJwtTokenHandler={setGoogleJwtTokenHandler} />
+          {!isLoading ? (
+            <GoogleAuth setGoogleJwtTokenHandler={setGoogleJwtTokenHandler} />
+          ) : (
+            <Spinner styleSize="!w-10 !h-10" />
+          )}
         </div>
       ) : (
         <div className="flex flex-col items-center mt-4 text-4xl font-bold text-red-500">
