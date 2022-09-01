@@ -1,41 +1,32 @@
-1) Build server as docker
+1) Build and deploy verifierServer and chainlink node.
 in this folder chainlink related data is stored.
-note that for this to work, you will need to build verifierServer's docker image and tag it.
-cd ../verifierServer/
-sudo docker build -t verifier .
-
-2) Deploy chianlink node
-to deploy chainlink node run:
-sudo docker-compose up
-in this folder.
-this should deploy verifier, chainlink and postgres.
-If you want your changes to verifierServer to be applied to the container, stop the server, build the image and rerun docker-compose.
+this includes a docker-compose.yaml file which is for running both the node and verifierServer.
+docker-compose up will build and pull the appropriate images and run both the chainlink node as well as verfierServer.
+note that docker-compose up will NOT rebuild images. if you made any changes to the Dockerfile in this folder or if you changed anything in verifierServer folder you will need to stop running instances (using CTRL+C in the terminal session where docker-compose is running) and run docker-compose build && docker-compose up.
 to open chainlink UI, visit http://localhost:6688/
 default username for chainlink node: user@example.com
 default password for chainlink node: PA@SSword1234!567
-
-(optional - deposit eth on link node)
+2) Deposit Eth and LINK
 This chainlink node will run on goerli testnet and will have it's own ethereum address, you will have to deposit GoerliEth and link to this address.
+note that this is not optional, if you do not do this the chainlink node will fail to communicate with any oracle you deploy.
 you can get goerli ETH at https://goerlifaucet.com
 you can get testnet LINK by following this tutorial https://docs.chain.link/docs/acquire-link/
+make sure to deposit more than 0.15 GoerliEth.
 
-3) Deploy Oracle
-after you have done this you will need to deploy oracle for the contracts to work.
-to deploy oracle:
-open https://remix.ethereum.org/#url=https://docs.chain.link/samples/NodeOperators/Oracle.sol in your webbrowser.
-from the deployment drop down menu: select Oracle.
-deploy the oracle using 0.6.6 solidity compiler on geoerli testnet.
-after deployment, go to your chainlink node ui and copy the address.
-call setFulfulmentPermisons on oracle contract with the address you copied as the first parameter and true as the second parameter, if you skip this step than chainlink node will silently fail.
-you can read more about this topic from official documentation:
-https://docs.chain.link/docs/fulfilling-requests/
+3) Add bridge to chainlink node
+go to http://localhost:6688/ and login.
+after logging in go to bridges.
+add bridge with name verifier and with url http://verifier:4040/verifyJWT
+you can leave every other option as is.
 
-4) Creating Bridge, Job in Link Node
-in chainlink node ui, go to bridges,
-create bridge with name "verifier" and url http://verifier:4040/verifyJWT
-go to jobs, create a new jobs with the contents of job.toml, make sure that you replace multiple occurances of 0x8E5A56F915B56FCFdB8Cc7E881D68b0d72900014 with your oracle's address
-after adding the job, you will get a jobId,
-open IdentityStore.sol with remix.
-replace 0x8E5A56F915B56FCFdB8Cc7E881D68b0d72900014 with your oracles address.
-replace jobId with the jobId you got from chainlink, make sure to remove the dashes(-).
-after you have done this, you should be able to use IdentityStore contract
+4) Deploying contracts and adding job to chainlink node
+edit constants.json in this folder, make sure to change LINK_NODE_ADDRESS to your chainlink node's eth address.
+run yarn deploy-contracts.
+this script will deploy the oracle contract first.
+after oracle contract is deployed the script will ask you for jobId, to get the jobId you will need to add job to chainlink node. the config file will be already copied, you just need to go to jobs in chainlink webui, paste it, add it and paste the jobId into the script.
+after this the IdentityStore contract will be deployed and it's address will be printed alongside other information. you will need to deposit LINK to the contracts address for it to work.
+the contract needs 0.1 LINK for each request it sends to the oracle.
+
+you can interact with the contract by running the backend (the back/ folder, not verifierServer) and making calls with the python library.
+note that having jobs in  "suspended" state is normal, it means that chainlink is submitting a transaction, it should change to "complete" within 10-20 minutes, if it doesn't, deposit more goerliEth and LINK to the node's address.
+
