@@ -32,21 +32,28 @@ app.post(
       let email = "";
       try {
         const payload = ticket.getPayload();
+        console.log("payload", JSON.stringify(payload));
         if (payload) email = payload.email || "";
       } catch (e) {
         email = "";
       }
-      if (req.body.email === email && email !== "")
-        res.status(200).send({
+      if (req.body.data.email === email && email !== "") {
+        const response = {
           id: req.body.id,
           data: {
-            proof: req.body.proof,
+            proof: "0x" + Buffer.from(req.body.data.proof, "base64").toString('hex'),
             email: email,
-            publicAddress: req.body.publicAddress,
+            publicAddress:
+              "0x" +
+              Buffer.from(req.body.data.publicAddress, "base64").toString(
+                "hex"
+              ),
           },
-        });
-      else {
-        res.status(200).send({
+        };
+        console.log("response 1", response);
+        res.status(200).send(response);
+      } else {
+        const response = {
           id: req.body.id,
           data: {
             proof:
@@ -54,7 +61,9 @@ app.post(
             email: email,
             publicAddress: "0x0000000000000000000000000000000000000000",
           },
-        });
+        };
+        console.log("response 2", response);
+        res.status(200).send(response);
       }
     } catch (Err: any) {
       console.log("[verifyJWT] - Error", Err?.message);

@@ -15,9 +15,9 @@ observationSource = """
     parse_proof    [type=jsonparse path="data,proof" data="$(fetch)"] 
     parse_email    [type=jsonparse path="data,email" data="$(fetch)"]
     parse_publicAddress [type=jsonparse path="data,publicAddress" data="$(fetch)"]
-    encode_data  [type=ethabiencode abi="(string _email, bytes32 _proof, address _publicAddress)" data="{ \\"_email\\": $(parse_email), \\"_proof\\": $(parse_proof), \\"_publicAddress\\": $(parse_publicAddress) }"]
+    encode_data  [type=ethabiencode abi="(bytes32 requestId, string _email, bytes32 _proof, address _publicAddress)" data="{ \\"requestId\\": $(decode_log.requestId), \\"_email\\": $(parse_email), \\"_proof\\": $(parse_proof), \\"_publicAddress\\": $(parse_publicAddress) }"]
     encode_tx    [type=ethabiencode
-                  abi="fulfillOracleRequest(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes32 data)"
+                  abi="fulfillOracleRequest2(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes calldata data)"
                   data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
                  ]
     submit_tx    [type=ethtx to="%oracle%" data="$(encode_tx)"]
