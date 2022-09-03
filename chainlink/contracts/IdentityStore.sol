@@ -7,6 +7,7 @@ struct IdentityStoreEntry {
     string email;
     bytes32 proof;
     address publicAddress;
+    bytes32[] approvals;
 }
 
 contract IdentityStore is ChainlinkClient, ConfirmedOwner {
@@ -17,11 +18,42 @@ contract IdentityStore is ChainlinkClient, ConfirmedOwner {
     bytes32 private jobId;
     uint256 private fee;
 
-    constructor(address _chainLinkToken, address _chainLinkOracle, bytes32 _jobId) ConfirmedOwner(msg.sender) {
+    address chainLinkOracle1;
+    bytes32 jobId1;
+    address chainLinkOracle2;
+    bytes32 jobId2;
+    address chainLinkOracle3;
+    bytes32 jobId3;
+
+    constructor(address _chainLinkToken, address _chainLinkOracle1, bytes32 _jobId1, address _chainLinkOracle2, bytes32 _jobId2, address _chainLinkOracle3, bytes32 _jobId3) ConfirmedOwner(msg.sender) {
         setChainlinkToken(_chainLinkToken);
-        setChainlinkOracle(_chainLinkOracle);
-        jobId = _jobId;
+        chainLinkOracle1 = _chainLinkOracle1;
+        jobId1 = _jobId1;
+        chainLinkOracle2 = _chainLinkOracle2;
+        jobId2 = _jobId2;
+        chainLinkOracle3 = _chainLinkOracle3;
+        jobId3 = _jobId3;
         fee = (1 * LINK_DIVISIBILITY) / 10;
+    }
+
+    function buildReq(
+        bytes32 _jobId,
+        string memory _email,
+        bytes32 _proof,
+        address _publicAddress,
+        string memory jwt
+    ) view internal returns (Chainlink.Request memory) {
+
+        Chainlink.Request memory req = buildChainlinkRequest(
+            _jobId,
+            address(this),
+            this.fulfill.selector
+        );
+        req.add("email", _email);
+        req.addBytes("proof", abi.encodePacked(_proof));
+        req.addBytes("publicAddress", abi.encodePacked(_publicAddress));
+        req.add("jwt", jwt);
+        return req;
     }
 
     function addIdentityStoreEntry(
@@ -32,7 +64,7 @@ contract IdentityStore is ChainlinkClient, ConfirmedOwner {
         uint8 signature_v,
         bytes32 signature_r,
         bytes32 signature_s
-    ) public returns (bytes32) {
+    ) public {
         require(_proof.length > 0, "proof's length must be greater than 0");
         for (uint256 i = 0; i < arr.length; i++) {
             require(
@@ -61,16 +93,12 @@ contract IdentityStore is ChainlinkClient, ConfirmedOwner {
 
         usedJWTs.push(jwt);
         // verify jwt here
-        Chainlink.Request memory req = buildChainlinkRequest(
-            jobId,
-            address(this),
-            this.fulfill.selector
-        );
-        req.add("email", _email);
-        req.addBytes("proof", abi.encodePacked(_proof));
-        req.addBytes("publicAddress", abi.encodePacked(_publicAddress));
-        req.add("jwt", jwt);
-        return sendChainlinkRequest(req, fee);
+        Chainlink.Request memory req1 = buildReq(jobId1, _email, _proof, _publicAddress, jwt);
+        sendChainlinkRequestTo(chainLinkOracle1, req1, fee);
+        Chainlink.Request memory req2 = buildReq(jobId2, _email, _proof, _publicAddress, jwt);
+        sendChainlinkRequestTo(chainLinkOracle2, req2, fee);
+        Chainlink.Request memory req3 = buildReq(jobId3, _email, _proof, _publicAddress, jwt);
+        sendChainlinkRequestTo(chainLinkOracle3, req3, fee);
     }
 
     function fulfill(
@@ -85,7 +113,28 @@ contract IdentityStore is ChainlinkClient, ConfirmedOwner {
             data.proof = _proof;
             data.publicAddress = _publicAddress;
             data.blockId = block.number;
-            arr.push(data);
+            uint256 index = arr.length;
+            for (uint256 i = 0; i < arr.length; i++) {
+                if (keccak256(bytes(arr[i].email)) == keccak256(bytes(data.email))
+                    && (keccak256(abi.encodePacked(arr[i].proof)) == keccak256(abi.encodePacked(data.proof)))
+                    && (keccak256(abi.encodePacked(arr[i].publicAddress)) == keccak256(abi.encodePacked(data.publicAddress)))
+                   ) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == arr.length) {
+                arr.push(data);
+            }
+            bool approvedAlready = false;
+            for (uint256 i = 0; i < arr[index].approvals.length; i++) {
+                if (arr[index].approvals[i] == _requestId) {
+                    approvedAlready = true;
+                }
+            }
+            if (!approvedAlready) {
+                arr[index].approvals.push(_requestId);
+            }
         }
     }
 
@@ -95,7 +144,7 @@ contract IdentityStore is ChainlinkClient, ConfirmedOwner {
     returns (string memory)
     {
         for (uint256 i = 0; i < arr.length; i++) {
-            if (arr[arr.length - 1 - i].publicAddress == _publicAddress) return arr[i].email;
+            if (arr[arr.length - 1 - i].publicAddress == _publicAddress && arr[arr.length - 1 - i].approvals.length >= 2) return arr[i].email;
         }
         return "";
     }

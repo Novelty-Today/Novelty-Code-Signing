@@ -30,7 +30,7 @@ const deployOracleSC = async () => {
 };
 
 // 2. insert Oracle Address into job.toml file
-const insertOracleAddress = async () => {
+const insertOracleAddress = async (num) => {
   try {
     let data = fs.readFileSync("./oracle_constants.json", "utf8");
     let jobToml = fs.readFileSync(
@@ -38,7 +38,7 @@ const insertOracleAddress = async () => {
       "utf8"
     );
     data = JSON.parse(data);
-    jobToml = jobToml.replaceAll("%oracle%", data?.ORACLE_ADDRESS);
+    jobToml = jobToml.replaceAll("%oracle%", data[`ORACLE_ADDRESS_${num}`]);
     fs.writeFileSync("./job.toml", jobToml.toString());
   } catch (err) {
     console.error(err);
@@ -52,12 +52,12 @@ const copyJob = async () => {
   );
 };
 
-const changeJobId = async () => {
+let changeJobData = {};
+const changeJobId = async (num) => {
   try {
     let jobId = prompt("Please, enter jobId: ");
-    let data = {};
-    data["JOB_ID"] = jobId.replaceAll("-", "");
-    fs.writeFileSync("./jobId.json", JSON.stringify(data));
+    changeJobData[`JOB_ID_${num}`] = jobId.replaceAll("-", "");
+    fs.writeFileSync("./jobId.json", JSON.stringify(changeJobData));
   } catch (err) {
     console.error(err);
   }
@@ -109,9 +109,17 @@ const copyFiles = async () => {
 
 const automatedDeployment = async () => {
   await deployOracleSC();
-  await insertOracleAddress();
+
+  await insertOracleAddress(0);
   await copyJob();
-  await changeJobId();
+  await changeJobId(0);
+  await insertOracleAddress(1);
+  await copyJob();
+  await changeJobId(1);
+  await insertOracleAddress(2);
+  await copyJob();
+  await changeJobId(2);
+
   await deployIdentitySC();
   await copyFiles();
 };

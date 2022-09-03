@@ -5,23 +5,28 @@ const oracleData = require("../oracle_constants.json");
 const jobId = require("../jobId.json");
 
 const { LINK_TOKEN_ADDRESS } = data;
-const { ORACLE_ADDRESS } = oracleData;
-const { JOB_ID } = jobId;
+const { ORACLE_ADDRESS_0, ORACLE_ADDRESS_1, ORACLE_ADDRESS_2 } = oracleData;
+const { JOB_ID_0, JOB_ID_1, JOB_ID_2 } = jobId;
 async function main() {
   // Deploying IdentityStore Contract
   const IdentityStore = await ethers.getContractFactory("IdentityStore");
-  console.log(
-    "0x" +
-      JOB_ID.split("").reduce(
-        (prev, cur) => prev + cur.charCodeAt(0).toString(16),
-        ""
-      )
-  );
   const identityStore = await IdentityStore.deploy(
     `0x${LINK_TOKEN_ADDRESS}`,
-    ORACLE_ADDRESS,
+    ORACLE_ADDRESS_0,
     "0x" +
-      JOB_ID.split("").reduce(
+      JOB_ID_0.split("").reduce(
+        (prev, cur) => prev + cur.charCodeAt(0).toString(16),
+        ""
+      ),
+    ORACLE_ADDRESS_1,
+    "0x" +
+      JOB_ID_1.split("").reduce(
+        (prev, cur) => prev + cur.charCodeAt(0).toString(16),
+        ""
+      ),
+    ORACLE_ADDRESS_2,
+    "0x" +
+      JOB_ID_2.split("").reduce(
         (prev, cur) => prev + cur.charCodeAt(0).toString(16),
         ""
       )
